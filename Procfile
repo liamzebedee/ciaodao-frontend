@@ -1,0 +1,1 @@
+web: cd social/ && npm i && npm run build && npm start -- --port $PORT
