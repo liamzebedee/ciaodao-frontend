@@ -6,6 +6,9 @@
         "export": "next export",
         "copy-contracts": "cp ../fundao/build/contracts/*.json chain/"
     },
+    "engines": {
+        "node": "10.16.0"
+    },
     "dependencies": {
         "3box": "1.10.7",
         "3id-resolver": "^0.0.6",
