@@ -167,7 +167,7 @@ function Page({ createSpace, form }) {
     return <PageTemplate className="container">
         <Layout>
             <header>
-                <LoggedInUser/>
+                <LoggedInUser/> 
             </header>
 
             <h1>Spaces</h1>

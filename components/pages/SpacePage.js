@@ -94,9 +94,9 @@ class Page extends Component {
 
     async componentDidMount() {
         const { addr } = this.props
-        
+         
         // open 3chat space
-        const space = await box.openSpace(addr)
+        const space = await box.openSpace(`ciaodao:space:${addr}`)
 
         let myDid = space.DID;
 

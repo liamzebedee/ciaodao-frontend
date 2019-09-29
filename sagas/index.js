@@ -8,6 +8,7 @@ import { ethers, ContractFactory } from 'ethers';
 import { MEMBERSHIP_TYPE_TOKEN, MEMBERSHIP_TYPE_INVITE } from '../components/pages/SpacesPage';
 import { submitThing } from '../actions';
 import { getMembers } from '../selectors';
+// import Router from 'next/router'
 
 let provider
 let signer 
@@ -49,6 +50,9 @@ export const SUBMIT_THING = 'SUBMIT_THING'
 export const FETCH_PROFILE = 'FETCH_PROFILE'
 export const FETCH_PROFILE_SUCCESS = 'FETCH_PROFILE_SUCCESS'
 export const FETCH_PROFILE_ETH_ADDRESS_SUCCESS = 'FETCH_PROFILE_ETH_ADDRESS_SUCCESS'
+
+export const USER_LOGOUT_BEGIN = 'USER_LOGOUT_BEGIN'
+export const USER_LOGOUT = 'USER_LOGOUT'
 
 function getArtifact(name) {
     const artifact = require(`../chain/${name}.json`)
@@ -155,13 +159,13 @@ export function* createGroup({ payload }) {
 
     if(membershipType == MEMBERSHIP_TYPE_TOKEN) {
         tx = yield call(
-            contract.functions.createERC20Space,
+            contract.functions.createTokenSpace,
             name,
             addressDetails[0]
         )
     } else if(membershipType == MEMBERSHIP_TYPE_INVITE) {
         tx = yield call(
-            contract.functions.createSpace,
+            contract.functions.createPersonalSpace,
             name,
             addressDetails
         )
@@ -230,7 +234,7 @@ export function* loadPosts({ payload }) {
     console.log(newMembers)
 
     // load profiles that we haven't loaded yet
-    const artifact = getArtifact('Space')
+    const artifact = getArtifact('ISpace')
     const contract = new ethers.Contract( 
         spaceAddress, 
         artifact.abi, 
@@ -315,6 +319,13 @@ export function* fetchProfile({ payload: { did } }) {
     */
 }
 
+export function* logout() {
+    // yield call(persistor.pause)
+    yield put({
+        type: USER_LOGOUT
+    })
+    Router.push('/')
+}
 
 export default function* () {
     yield takeLatest(LOAD_WEB3, loadWeb3)
@@ -325,4 +336,5 @@ export default function* () {
     yield takeLatest(SUBMIT_THING, submitThing)
     yield takeLatest(LOAD_POSTS, loadPosts)
     yield takeEvery(FETCH_PROFILE, fetchProfile)
+    yield takeLatest(USER_LOGOUT_BEGIN, logout)
 }
