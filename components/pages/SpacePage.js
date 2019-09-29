@@ -4,15 +4,15 @@ import { Card, ListGroup, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import styled from 'styled-components';
-import { loadSpace, loadPosts } from '../../actions';
+import { loadSpace, loadPosts, submitThing } from '../../actions';
 import { box } from "../../sagas";
 import LazyProfileTile from "../atoms/LazyProfileTile";
 import PageTemplate from "./PageTemplate";
 import css from "./space.less";
 import PostThing from '../atoms/PostThing';
 import { filterPosts, getMembers } from '../../selectors';
-
-
+import { BasicSpinner } from '../atoms/BasicSpinner'
+import Feed from '../atoms/Feed'
 
 const Layout = styled.div`
 width: 100%;
@@ -41,37 +41,9 @@ flex: 1;
 `
 
 
-const TEMPORARY_MODERATOR = 'did:muport:QmRTNPefmFga68GnzYPzQR3ZsYYNdQoTVgKCpuBjZQrRTZ'
 
-const Feed = ({ thread, posts }) => {
-    const [postThingKey, setPostThingKey] = useState(0)
 
-    return <div className={css.feed}>
-        <div className={`heading`}>
-            <h3 className='title'>Feed</h3>
-        </div>
 
-        <div className={`${css.composer} composer`}>
-            <PostThing key={postThingKey} submitThing={async (message) => {
-                try { 
-                    await thread.post(message) 
-                    setPostThingKey(postThingKey+1)
-                }
-                catch(ex) {
-                    console.error(ex)
-                }
-            }}/>
-        </div>
-
-        { posts
-        ? filterPosts(posts).map(post => <Post key={post.postId} {...post} {...{
-            // address: "0x1cdad033df958291390ba7265be81b84cb6bfcfb"
-        }}/>)
-        : null }
-
-        <footer></footer>
-    </div>
-}
 
 const Members = ({ posts }) => {
     let members = getMembers(posts)
@@ -94,48 +66,13 @@ class SpacePage extends Component {
 
     async componentDidMount() {
         const { addr } = this.props
-         
-        // open 3chat space
-        const space = await box.openSpace(`ciaodao:space:${addr}`)
-
-        let myDid = space.DID;
-
-        const thread = await space.joinThread('posts', { 
-            members: false,
-            firstModerator: TEMPORARY_MODERATOR
-        })
-
-        this.setState({
-            myDid,
-            space,
-            thread,
-        })
-
-        console.log(`Loading posts`)
-        const posts = await thread.getPosts()
-        console.log(`${posts.length} posts loaded`)
-        this.setState({
-            posts
-        })
-        this.props.loadPosts(posts, addr)
-        
-
-        thread.onUpdate(async res => {
-            console.log('Thread update:', res)
-
-            const posts = await thread.getPosts()
-            this.setState({
-                posts
-            })
-            this.props.loadPosts(posts, addr)
-        })
+        this.props.loadSpace(addr)
     }
 
     render() {
-        const { space, thread, posts } = this.state
-        const { name } = this.props.space
-        
-        if(!space) return '...'
+        const { space, thread } = this.state
+        const { addr, submitThing } = this.props
+        const { name, posts } = this.props.space
 
         // const name = space && space.name || 'unnamed'
         const { view, postThingKey } = this.state
@@ -149,7 +86,9 @@ class SpacePage extends Component {
         let content
         switch(view) {
             case views.home:
-                content = <Feed {...{ thread, posts }}/>
+                content = <Feed submitThing={(text) => {
+                    submitThing(addr, 'chat', text)
+                }} {...{ thread, posts }}/>
                 break
             case views.members:
                 content = <Members {...{ posts }}/>
@@ -169,8 +108,8 @@ class SpacePage extends Component {
             </header>
             
             <h1>
-                <Button variant="primary">Join</Button>
-                &nbsp;{name}
+                {/* <Button variant="primary">Join</Button>&nbsp; */}
+                {name}
             </h1>
             
             <Layout>
@@ -215,7 +154,8 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(
         {
             loadSpace,
-            loadPosts
+            loadPosts,
+            submitThing
         },
         dispatch
     )

@@ -6,7 +6,6 @@ import { persistor } from '../pages/_app';
 import Web3 from 'web3';
 import { ethers, ContractFactory } from 'ethers';
 import { MEMBERSHIP_TYPE_TOKEN, MEMBERSHIP_TYPE_INVITE } from '../components/pages/SpacesPage';
-import { submitThing } from '../actions';
 import { getMembers } from '../selectors';
 // import Router from 'next/router'
 
@@ -41,6 +40,7 @@ export const CREATE_GROUP = 'CREATE_GROUP'
 export const CREATE_GROUP_WEB3_BEGIN = 'CREATE_GROUP_WEB3_BEGIN'
 export const CREATE_GROUP_WEB3_SUCCESS = 'CREATE_GROUP_WEB3_SUCCESS'
 
+export const LOAD_SPACE = 'LOAD_SPACE'
 export const SPACES_LOAD = 'SPACES_LOAD'
 export const SPACE_LOAD = 'SPACE_LOAD'
 export const SPACE_LOAD_SUCCESS = 'SPACE_LOAD_SUCCESS'
@@ -190,23 +190,101 @@ export function* createGroup({ payload }) {
         }
     })
 
-    yield loadSpace(space)
+    // yield loadSpace(space)
 }
 
 export function* loadSpaces() {
     const spaces = yield select(state => state.spaces.data)
     
     // go through all and get updated metadata
-    for(let space in Object.values(spaces)) {
-        yield call(loadSpace, space.addr)
+    // for(let space in Object.values(spaces)) {
+    //     yield call(loadSpace, space.addr)
+    // }
+}
+
+
+let openedSpaces = {}
+
+
+export async function openSpace(addr) {
+    let space = openedSpaces[addr]
+
+    if(!space) {
+        // open 3chat space
+        space = await box.openSpace(`ciaodao:space:${addr}`)
+    }
+
+    return space
+}
+
+const TEMPORARY_MODERATOR = 'did:muport:QmRTNPefmFga68GnzYPzQR3ZsYYNdQoTVgKCpuBjZQrRTZ'
+export function* loadSpace({ payload }) {
+    const { addr } = payload
+
+    const space = yield call(openSpace, addr)
+
+    const thread = yield call(() => space.joinThread('posts', { 
+        members: false,
+        firstModerator: TEMPORARY_MODERATOR
+    }))
+    
+
+    // console.log(`Loading posts`)
+    const posts = yield call(() => thread.getPosts())
+
+    // console.log(`${posts.length} posts loaded`)
+    // this.setState({
+    //     posts
+    // })
+    // this.props.loadPosts(posts, addr)
+
+    yield fork(loadPosts, {
+        payload: {
+            spaceAddress: addr,
+            posts,
+        }
+    })
+
+    const threadUpdate = watchThreadPosts(thread)
+    while(true) {
+        yield take(threadUpdate)
+        const posts = yield call(() => thread.getPosts())
+        yield fork(loadPosts, {
+            payload: {
+                spaceAddress: addr,
+                posts,
+            }
+        })
     }
 }
+
+function watchThreadPosts(thread) {
+    return eventChannel(emitter => {
+        thread.onUpdate(res => {
+            // Redux Saga Event Channels will ERROR on null/undefined values
+            emitter({ res })
+        })
+        return () => {
+            // unsub
+            return true
+        }
+    })
+}
+
 
 
 export function* loadPosts({ payload }) {
     const { posts, spaceAddress } = payload
 
     if(!posts.length) return
+
+    yield put({
+        type: SPACE_LOAD_POSTS_SUCCESS,
+        payload: {
+            addr: spaceAddress,
+            posts,
+        }
+    })
 
     console.log(`Loading post metadata (profiles etc.)`)
 
@@ -242,6 +320,8 @@ export function* loadPosts({ payload }) {
     }
 
     console.log(newMembers)
+
+    // SPACE_LOAD_POSTS_SUCCESS
 }
 
 
@@ -254,6 +334,38 @@ export function* logout() {
     Router.push('/')
 }
 
+export function* watchLoadSpace(action) {
+    // yield takeEvery(LOAD_SPACE, loadSpace)
+    const watched = {}
+
+    while (true) {
+        const action = yield take(action => {
+            return action.type == LOAD_SPACE && 
+                !watched[action.payload.addr]
+        })
+
+        watched[action.payload.addr] = yield fork(loadSpace, action)
+    }
+}
+
+export function* submitThing({ payload }) {
+    const { spaceAddress, threadKey, text } = payload
+
+    const space = yield call(openSpace, spaceAddress)
+
+    const thread = yield call(() => space.joinThread('posts', { 
+        members: false,
+        firstModerator: TEMPORARY_MODERATOR
+    }))
+
+    yield call(() => thread.post(text))
+    
+    yield put({
+        type: 'foo'
+    })
+}
+
+
 export default function* () {
     yield takeLatest(LOAD_WEB3, loadWeb3)
     yield takeLatest(LOAD_BOX3, loadBox3)
@@ -264,4 +376,5 @@ export default function* () {
     yield takeLatest(LOAD_POSTS, loadPosts)
     yield takeEvery(FETCH_PROFILE, fetchProfile)
     yield takeLatest(USER_LOGOUT_BEGIN, logout)
+    yield fork(watchLoadSpace)
 }

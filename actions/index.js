@@ -1,4 +1,4 @@
-import { LOAD_BOX3, VISIT_SPACES, CREATE_GROUP, LOAD_WEB3, SUBMIT_THING, SPACES_LOAD, SPACE_LOAD, LOAD_POSTS, FETCH_PROFILE, USER_LOGOUT, USER_LOGOUT_BEGIN } from "../sagas";
+import { LOAD_BOX3, VISIT_SPACES, CREATE_GROUP, LOAD_WEB3, SUBMIT_THING, SPACES_LOAD, SPACE_LOAD, LOAD_POSTS, FETCH_PROFILE, USER_LOGOUT, USER_LOGOUT_BEGIN, LOAD_SPACE } from "../sagas";
 
 export function loadWeb3() {
     return {
@@ -35,16 +35,21 @@ export function loadSpaces() {
 
 export function loadSpace(addr) {
     return {
-        type: SPACE_LOAD,
+        type: LOAD_SPACE,
         payload: {
             addr,
         }
     }
 }
 
-export function submitThing() {
+export function submitThing(spaceAddress, threadKey, text) {
     return {
-        type: SUBMIT_THING
+        type: SUBMIT_THING,
+        payload: {
+            spaceAddress,
+            threadKey,
+            text,
+        }
     }
 }
 
