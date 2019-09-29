@@ -111,34 +111,25 @@ class Page extends Component {
             thread,
         })
 
+        console.log(`Loading posts`)
         const posts = await thread.getPosts()
-        
-        this.props.loadPosts(posts, addr)
-
+        console.log(`${posts.length} posts loaded`)
         this.setState({
             posts
         })
+        this.props.loadPosts(posts, addr)
+        
 
         thread.onUpdate(async res => {
-            const posts = await thread.getPosts()
-            this.props.loadPosts(posts, addr)
+            console.log('Thread update:', res)
 
+            const posts = await thread.getPosts()
             this.setState({
                 posts
             })
+            this.props.loadPosts(posts, addr)
         })
     }
-
-    // loadPosts = (posts) => {
-    //     const { profiles } = this.props
-    //     const newUsers = Array.from(new Set(posts.map(post => post.author).filter(did => !profiles[did])))
-
-    //     newUsers.map(did => {
-    //         Box.getProfile(did).then(profile => {
-    //             this.props.addUserProfile(did, profile)
-    //         })
-    //     })
-    // }
 
     render() {
         const { space, thread, posts } = this.state
