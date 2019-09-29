@@ -12,7 +12,6 @@ const initialState = {
 function Space(addr, name, thread, chainId) {
     this.addr = addr
     this.chainId = chainId
-    this.members = []
     this.posts = []
     this.name = name
     this.thread = thread

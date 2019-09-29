@@ -223,6 +223,10 @@ async function getEthereumAddress(did, profile) {
 export function* loadPosts({ payload }) {
     const { posts, spaceAddress } = payload
 
+    if(!posts.length) return
+
+    console.log(`Loading post metadata (profiles etc.)`)
+
     // Filter posts
     const spaceMembers = yield select(state => state.spaces.members)
     const unknownUsers = _.difference(
@@ -280,7 +284,7 @@ export function* fetchProfile({ payload: { did } }) {
     let profile = yield call(Box.getProfile, did)
     let ethAddress = yield call(getEthereumAddress, did, profile)
 
-    console.log(profile,ethAddress)
+    console.log('Fetch profile:', profile, ethAddress)
 
     let profileComplete = profile.name && profile.image.length
     if(profileComplete) {

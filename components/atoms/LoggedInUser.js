@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 
 import styled from 'styled-components'
-import { ProfileTile } from './ProfileTile';
 import { Dropdown } from 'react-bootstrap';
 import LazyProfileTile from "./LazyProfileTile"
 import { logout } from '../../actions'
@@ -42,8 +41,10 @@ class UserProfileToggle extends React.Component {
     render() {
         const { myDid, myAddress, myProfile } = this.props
         const profile = myProfile
-        return <div className="media" onClick={this.handleClick}>
-            <LazyProfileTile did={myDid}/>
+        return <div className="media">
+            <div onClick={this.handleClick}>
+              <LazyProfileTile did={myDid}/>
+            </div>
             {(profile && profile.name) || `Unknown#${myDid.slice(-6)}`}
             <br/>{myAddress}
         </div>
