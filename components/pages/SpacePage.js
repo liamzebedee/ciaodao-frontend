@@ -1,10 +1,10 @@
 import Box from '3box';
 import React, { Component, useState, useEffect } from "react";
-import { Card, ListGroup } from 'react-bootstrap';
+import { Card, ListGroup, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import styled from 'styled-components';
-import { addUserProfile, loadSpace, loadPosts } from '../../actions';
+import { loadSpace, loadPosts } from '../../actions';
 import { box } from "../../sagas";
 import LazyProfileTile from "../atoms/LazyProfileTile";
 import PageTemplate from "./PageTemplate";
@@ -84,7 +84,7 @@ const Members = ({ posts }) => {
 
 import Post from '../atoms/Post';
 
-class Page extends Component {
+class SpacePage extends Component {
     state = {
         thread: null,
         posts: null,
@@ -133,9 +133,11 @@ class Page extends Component {
 
     render() {
         const { space, thread, posts } = this.state
+        const { name } = this.props.space
+        
         if(!space) return '...'
 
-        const name = space && space.name || 'unnamed'
+        // const name = space && space.name || 'unnamed'
         const { view, postThingKey } = this.state
 
         const views = {
@@ -166,21 +168,14 @@ class Page extends Component {
                 <a href="/spaces">{`<<`} Back to spaces</a>
             </header>
             
-            <h1>{name}</h1>            
+            <h1>
+                <Button variant="primary">Join</Button>
+                &nbsp;{name}
+            </h1>
             
             <Layout>
                 <div className='right'>
-                    {/* <Card>
-                        <ListGroup style={{ width: '18rem' }} variant="flush">
-                            <ListGroup.Item>
-                                Member
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Card> */}
                     <Card>
-                        <Card.Header>
-                            <p>You're not a member.</p>
-                        </Card.Header>
                         <ListGroup style={{ width: '18rem' }} variant="flush" className='menuitems'>
                             <ListGroup.Item action onClick={() => this.setState({ view: views.home })} active={view == views.home}>
                                 <i className="fas fa-home"></i>  Home
@@ -220,11 +215,10 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators(
         {
             loadSpace,
-            addUserProfile,
             loadPosts
         },
         dispatch
     )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Page)
+export default connect(mapStateToProps, mapDispatchToProps)(SpacePage)

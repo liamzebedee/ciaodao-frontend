@@ -16,7 +16,8 @@ const Style = styled.div`
     justify-content: center;
 
     .media {
-        align-items: center;
+        align-items: left;
+        text-align: left;
     }
     
     img {
@@ -45,8 +46,10 @@ class UserProfileToggle extends React.Component {
             <div onClick={this.handleClick}>
               <LazyProfileTile did={myDid}/>
             </div>
-            {(profile && profile.name) || `Unknown#${myDid.slice(-6)}`}
-            <br/>{myAddress}
+            <div>
+              <strong>{(profile && profile.name) || `Unknown#${myDid.slice(-6)}`}</strong>
+              <br/>{myAddress}
+            </div>
         </div>
     }
 }
@@ -93,28 +96,30 @@ class CustomMenu extends React.Component {
 
 class Component extends React.Component {
   render() {
-    const { myAddress, myDid, myProfile, logout, loggedIn } = this.props
+    const { myAddress, myDid, myProfile, logout, loggedIn, withDropdown } = this.props
     if(!loggedIn) return null
 
     return <Style>
-    <Dropdown>
-        <Dropdown.Toggle as={(props) => <UserProfileToggle {...{myAddress, myDid, myProfile, ...props}}/>} id="dropdown-custom-components">
-          Custom toggle
-        </Dropdown.Toggle>
-    
-        <Dropdown.Menu as={CustomMenu}>
-            <Dropdown.Header>Your profile</Dropdown.Header>
-          <Dropdown.Item eventKey="1" href={`https://3box.io/${myAddress}`}>
-              <i className="fas fa-portrait"></i> Edit details
-            </Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item eventKey="2" onSelect={() => logout()}>
-            <i className="fas fa-sign-out-alt"></i> Log out
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    
-        </Style>
+      { withDropdown 
+        ? <Dropdown>
+            <Dropdown.Toggle as={(props) => <UserProfileToggle {...{myAddress, myDid, myProfile, ...props}}/>} id="dropdown-custom-components">
+              Custom toggle
+            </Dropdown.Toggle>
+      
+            <Dropdown.Menu as={CustomMenu}>
+                <Dropdown.Header>Your profile</Dropdown.Header>
+              <Dropdown.Item eventKey="1" href={`https://3box.io/${myAddress}`}>
+                  <i className="fas fa-portrait"></i> Edit details
+                </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item eventKey="2" onSelect={() => logout()}>
+                <i className="fas fa-sign-out-alt"></i> Log out
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        : <UserProfileToggle onClick={() => {}} {...{myAddress, myDid, myProfile}}/>
+      }
+    </Style>
   }
 }
 

@@ -48,16 +48,6 @@ export function submitThing() {
     }
 }
 
-export function addUserProfile(user, profile) {
-    return {
-        type: 'ADD_USER_PROFILE',
-        payload: {
-            user,
-            profile
-        }
-    }
-}
-
 export function loadPosts(posts, spaceAddress) {
     return {
         type: LOAD_POSTS,

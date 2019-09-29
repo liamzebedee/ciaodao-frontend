@@ -134,7 +134,9 @@ import { bindActionCreators } from "redux";
 import LoggedInUser from "../atoms/LoggedInUser";
 
 
+const LoginForm = styled.div`
 
+`
 
 
 
@@ -146,17 +148,21 @@ function LandingPage({ loadBox3, data, visitSpaces }) {
             <Hero>ciao dao.</Hero>
         </HeroBlock>
 
+        <LoginForm>
         <center>
             { 
                 loggedIn 
                 ? <div>
-                    Logged in as <LoggedInUser/>
+                    <p className='logged-in-as'>
+                        <i>Logged in as:</i>
+                    </p>
+                    <LoggedInUser/>
                     <button type="button" className="btn btn-success" onClick={visitSpaces}>Visit my spaces</button>
                 </div> 
                 : <button type="button" className={`btn btn-primary`} disabled={loadingBox3} onClick={loadBox3}>Connect with 3Box</button> 
             }
-            
         </center>
+        </LoginForm>
 
         <br/><br/>
 
