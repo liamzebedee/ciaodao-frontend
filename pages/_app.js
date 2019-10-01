@@ -25,6 +25,8 @@ class MyApp extends App {
         <Head>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <meta charSet="utf-8" />
+            <link rel="icon" type="image/png" href="/static/favicon.png" />
+            <title>ciao~dao</title>
         </Head>
             
       <Container>
