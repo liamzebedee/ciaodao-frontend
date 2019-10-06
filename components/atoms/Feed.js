@@ -20,14 +20,17 @@ import css from "../pages/space.less";
 import PostThing from "./PostThing";
 import { filterPosts } from "../../selectors";
 import Post from "./Post";
+import Web3Wrapper from "../wrapper/Web3Wrapper";
+import Box3Wrapper from "../wrapper/Box3Wrapper";
+import { BasicSpinner } from "./BasicSpinner";
 
-const Feed = ({ submitThing, posts }) => {
+const Feed = ({ space, submitThing, posts }) => {
     const [postThingKey, setPostThingKey] = useState(0)
 
     return <div className={css.feed}>
         <div className={`heading`}>
-            <h3 className='title'>Chat</h3>
-            {/* <BasicSpinner loading={posts}/> */}
+            <h3 className='title'>{space.name}</h3>
+            {/* <BasicSpinner loading={1}/> */}
         </div>
 
         <div className={`${css.composer} composer`}>
@@ -41,10 +44,10 @@ const Feed = ({ submitThing, posts }) => {
                 }
             }}/>
         </div>
-
+        
         { posts
         ? filterPosts(posts).map(post => <Post key={post.postId} {...post}/>)
-        : null }
+        : null }        
 
         <footer></footer>
     </div>
@@ -54,7 +57,7 @@ export default Feed
 
 // function mapStateToProps(state, props) {
 //     return {
-//         space: state.spaces.data[props.addr],
+//         space: state.spaces[props.addr],
 //         profiles: state.spaces.profiles
 //     }
 // }

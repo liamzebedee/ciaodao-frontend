@@ -177,7 +177,7 @@ function LandingPage({ loadBox3, data, visitSpaces }) {
 
 function mapStateToProps(state, props) {
     return {
-        data: state.data
+        data: state.data,
     }
 }
 

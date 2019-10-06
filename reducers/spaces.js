@@ -1,64 +1,71 @@
-import { CREATE_GROUP_WEB3_SUCCESS, SPACE_LOAD_SUCCESS, SPACE_LOAD_POSTS_SUCCESS } from "../sagas";
+import Immutable from "seamless-immutable"
+import { CREATE_GROUP_WEB3_SUCCESS, SPACE_LOAD_SUCCESS, SPACE_LOAD_POSTS_SUCCESS, SPACE_SET_MEMBERS } from "../sagas";
 
-const initialState = {
-    data: {
-        '0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9': new Space('0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9', 'The Lobby', null, 3)
-    }
+class Space {
+    name = ""
+    ethAddress = ""
+    chainId = -1
+    members = []
+    posts = []
 }
 
-function Space(addr, name, thread, chainId) {
-    this.addr = addr
-    this.chainId = chainId
-    this.posts = []
-    this.name = name
-    this.thread = thread
-}
+const theLobby = new Space()
+theLobby.name = 'The Lobby'
+theLobby.ethAddress = '0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9'
+theLobby.chainId = 3
+
+const initialState = Immutable({
+    '0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9': theLobby
+})
+
+
 
 export default function reduce(state = initialState, action) {
     switch(action.type) {
         case CREATE_GROUP_WEB3_SUCCESS: {
-            const { space, name, thread, chainId } = action.payload
-            const { createdSpaces, data } = state
-            return {
-                ...state,
-                createdSpaces: createdSpaces.concat([ space ]),
-                data: {
-                    ...data,
-                    [space]: new Space(space, name, thread, chainId)
-                }
-            }
-        }
-        case SPACE_LOAD_SUCCESS: {
-            const { addr, thread } = action.payload
-            const { data } = state
-            const space = state.data[addr]
+            const { space, name, chainId } = action.payload
+            const ethAddress = space
 
-            return {
-                ...state,
-                data: {
-                    ...data,
-                    [addr]: {
-                        ...space,
-                        thread,
-                    }
-                }
-            }
+            const newSpace = new Space
+            newSpace.name = name
+            newSpace.ethAddress = ethAddress
+            newSpace.chainId = chainId
+
+            return Immutable.set(
+                state, 
+                ethAddress, 
+                newSpace
+            )
+        }
+        case 'INIT_SPACE': {
+            const ethAddress = action.payload.addr
+            let space = new Space
+            space.ethAddress = ethAddress
+            space.name = action.payload.name
+            return Immutable.set(
+                state, 
+                ethAddress, 
+                space
+            )
         }
         case SPACE_LOAD_POSTS_SUCCESS: {
             const { addr, posts } = action.payload
-            const { data } = state
-            const space = state.data[addr]
+            const ethAddress = addr
+            return Immutable.setIn(
+                state, 
+                [ethAddress, 'posts'], 
+                posts
+            )
+        }
+        case SPACE_SET_MEMBERS: {
+            const { addr, members } = action.payload
+            const ethAddress = addr
 
-            return {
-                ...state,
-                data: {
-                    ...data,
-                    [addr]: {
-                        ...space,
-                        posts,
-                    }
-                }
-            }
+            return Immutable.setIn(
+                state,
+                [ethAddress, 'members'],
+                members
+            )
         }
         default:
             return state

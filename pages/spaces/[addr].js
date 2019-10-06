@@ -8,9 +8,5 @@ export default () => {
     const router = useRouter()
     const { addr } = router.query
 
-    return <Web3Wrapper>
-        <Box3Wrapper>
-            <SpacePage {...{addr}}/>
-        </Box3Wrapper>
-    </Web3Wrapper>
+    return <SpacePage {...{addr}}/>
 }

@@ -1,4 +1,4 @@
-import { call, put, takeLatest, select, fork, cancelled, take, takeEvery, takeLeading } from 'redux-saga/effects'
+import { call, put, takeLatest, select, fork, cancelled, take, takeEvery, takeLeading, all } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
 import Box from '3box';
 import Router from 'next/router'
@@ -6,8 +6,7 @@ import { persistor } from '../pages/_app';
 import Web3 from 'web3';
 import { ethers, ContractFactory } from 'ethers';
 import { MEMBERSHIP_TYPE_TOKEN, MEMBERSHIP_TYPE_INVITE } from '../components/pages/SpacesPage';
-import { getMembers } from '../selectors';
-// import Router from 'next/router'
+import { getMembers as getAuthors } from '../selectors';
 
 import {
     fetchProfile, getEthereumAddress
@@ -43,11 +42,11 @@ export const CREATE_GROUP_WEB3_SUCCESS = 'CREATE_GROUP_WEB3_SUCCESS'
 export const LOAD_SPACE = 'LOAD_SPACE'
 export const SPACES_LOAD = 'SPACES_LOAD'
 export const SPACE_LOAD = 'SPACE_LOAD'
-export const SPACE_LOAD_SUCCESS = 'SPACE_LOAD_SUCCESS'
 
 export const LOAD_POSTS = "LOAD_POSTS"
 export const SPACE_LOAD_POSTS = 'SPACE_LOAD_POSTS'
 export const SPACE_LOAD_POSTS_SUCCESS = 'SPACE_LOAD_POSTS_SUCCESS'
+export const SPACE_SET_MEMBERS = 'SPACE_SET_MEMBERS'
 
 export const SUBMIT_THING = 'SUBMIT_THING'
 
@@ -78,7 +77,6 @@ async function getDeployment(artifact) {
     }
     
     return deploy.address.toLowerCase()
-    
 }
 
 
@@ -88,6 +86,7 @@ async function syncBox(box) {
     })
 }
 
+let wweb3
 export function* loadWeb3() {
     yield put({
         type: WEB3_LOADING
@@ -95,7 +94,9 @@ export function* loadWeb3() {
     const addresses = yield call(window.ethereum.enable)
     myAddress = addresses[0];
     // provider = new ethers.providers.Web3Provider(window.ethereum);
-    provider = new ethers.providers.Web3Provider(web3.currentProvider)
+    provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
+    web3 = new Web3(window.web3.currentProvider)
+
     signer = provider.getSigner(0);
     // yield call(() => new Promise((res,rej) => {
     //     provider.on('ready', res)
@@ -103,6 +104,7 @@ export function* loadWeb3() {
     // }))
 
     const network = yield call(() => provider.getNetwork())
+    console.log(network, signer)
     chainId = network.chainId
     // let network = yield call(provider.getNetwork)
     // chainId = MAINNET
@@ -194,7 +196,7 @@ export function* createGroup({ payload }) {
 }
 
 export function* loadSpaces() {
-    const spaces = yield select(state => state.spaces.data)
+    const spaces = yield select(state => state.spaces)
     
     // go through all and get updated metadata
     // for(let space in Object.values(spaces)) {
@@ -217,9 +219,101 @@ export async function openSpace(addr) {
     return space
 }
 
+let spaceContracts = {}
+
+
+function getSpaceContract(addr) {
+    let contract = spaceContracts[addr]
+    
+    if(!contract) {
+        const artifact = getArtifact('ISpace')
+        contract = new web3.eth.Contract(
+            artifact.abi,
+            addr
+        )
+
+        // contract = new ethers.Contract( 
+        //     addr, 
+        //     artifact.abi,
+        //     signer
+        // )
+    }
+
+    return contract
+}
+
 const TEMPORARY_MODERATOR = 'did:muport:QmRTNPefmFga68GnzYPzQR3ZsYYNdQoTVgKCpuBjZQrRTZ'
 export function* loadSpace({ payload }) {
     const { addr } = payload
+
+    yield call(loadBox3)
+
+
+    // Check if space is valid on current network
+    const contract = getSpaceContract(addr)
+    try {
+        console.log(contract)
+        // yield call(
+        //     contract.methods.isMember.call,
+        //     '0x0000000000000000000000000000000000000000'
+        // )
+        yield call(() => {
+            return contract.methods.isMember('0x0000000000000000000000000000000000000000').call()
+        })
+    } catch(ex) {
+        yield put({
+            type: 'OPEN_SPACE_FAILED',
+            payload: {
+                reason: "The smart contract doesn't implement membership"
+            }
+        })
+        throw ex
+    }
+
+    // get the space name
+    const artifact = getArtifact('SpaceCadetFactory')
+    const spaceCadetFactory_addr = yield call(getDeployment, artifact)
+    const spaceCadetFactory = new web3.eth.Contract(
+        artifact.abi,
+        spaceCadetFactory_addr
+    )
+
+    const evs = yield call(() => spaceCadetFactory.getPastEvents(
+        'NewSpace',
+        {
+            filter: {
+                space: addr
+            },
+            fromBlock: '0',
+            toBlock: 'latest'
+        }
+    ))
+    if(evs.length == 0) {
+        yield put({
+            type: 'OPEN_SPACE_FAILED',
+            payload: {
+                reason: "Couldn't retrieve the name for this space, from the SpaceCadetFactory"
+            }
+        })
+        throw ex
+    }
+    const ev = evs[0]
+    const { name } = ev.returnValues
+    
+    // const addr = yield call(getDeployment, artifact)
+    // const spaceCadetFactory = new ethers.Contract( 
+    //     addr, 
+    //     artifact.abi, 
+    //     signer
+    // )
+
+    const seen = yield select(state => state.spaces[addr])
+    if(!seen) {
+        yield put({
+            type: 'INIT_SPACE',
+            payload: { addr, name }
+        })
+    }
 
     const space = yield call(openSpace, addr)
 
@@ -229,14 +323,8 @@ export function* loadSpace({ payload }) {
     }))
     
 
-    // console.log(`Loading posts`)
+    console.log(`Loading posts`)
     const posts = yield call(() => thread.getPosts())
-
-    // console.log(`${posts.length} posts loaded`)
-    // this.setState({
-    //     posts
-    // })
-    // this.props.loadPosts(posts, addr)
 
     yield fork(loadPosts, {
         payload: {
@@ -278,33 +366,17 @@ export function* loadPosts({ payload }) {
 
     if(!posts.length) return
 
-    yield put({
-        type: SPACE_LOAD_POSTS_SUCCESS,
-        payload: {
-            addr: spaceAddress,
-            posts,
-        }
-    })
-
-    console.log(`Loading post metadata (profiles etc.)`)
-
     // Filter posts
-    const spaceMembers = yield select(state => state.spaces.members)
+    const members = yield select(state => state.spaces[spaceAddress].members)
+
+    // Check posts from unknown users
     const unknownUsers = _.difference(
-        getMembers(posts),
-        spaceMembers
+        getAuthors(posts),
+        members
     )
 
-    console.log(`New members:`)
-    console.log(newMembers)
-
-    // load profiles that we haven't loaded yet
-    const artifact = getArtifact('ISpace')
-    const contract = new ethers.Contract( 
-        spaceAddress, 
-        artifact.abi, 
-        signer
-    )
+    // Check membership status of unknown users
+    const contract = getSpaceContract(spaceAddress)
 
     let newMembers = []
     for(let did of unknownUsers) {
@@ -313,16 +385,36 @@ export function* loadPosts({ payload }) {
 
         // check membership
         // TODO(liamz) fully implement contract-wise
+        console.log(ethAddress)
 
-        // let isMember = yield call(() => contract.functions.isMember(ethAddress))
-        let isMember = true
-        if(isMember || 1) newMembers.push({ did, ethAddress })
+        let isMember = yield call(async () => {
+            const res = await contract.methods.isMember(ethAddress).call()
+            return res
+        })
+        if(isMember) newMembers.push({ did, ethAddress })
     }
 
-    console.log(newMembers)
+    const members2 = members.concat(newMembers)
 
-    // SPACE_LOAD_POSTS_SUCCESS
+    yield put({
+        type: SPACE_SET_MEMBERS,
+        payload: {
+            addr: spaceAddress,
+            members: members2
+        }
+    })
+
+    yield put({
+        type: SPACE_LOAD_POSTS_SUCCESS,
+        payload: {
+            addr: spaceAddress,
+            posts,
+        }
+    })
+
 }
+
+
 
 
 
@@ -335,7 +427,6 @@ export function* logout() {
 }
 
 export function* watchLoadSpace(action) {
-    // yield takeEvery(LOAD_SPACE, loadSpace)
     const watched = {}
 
     while (true) {
@@ -367,8 +458,17 @@ export function* submitThing({ payload }) {
 
 
 export default function* () {
-    yield takeLatest(LOAD_WEB3, loadWeb3)
+    // First load Web3 and 3Box
+    yield call(loadWeb3)
     yield takeLatest(LOAD_BOX3, loadBox3)
+    
+    // yield call(loadBox3)
+    // yield all([
+    //     call(loadWeb3),
+    //     call(loadBox3)
+    // ])
+
+    // Now listen to UI events.
     yield takeLatest(VISIT_SPACES, visitSpaces)
     yield takeLatest(CREATE_GROUP, createGroup)
     yield takeLatest(SPACES_LOAD, loadSpaces)

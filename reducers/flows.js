@@ -3,6 +3,7 @@ import { CREATE_GROUP_WEB3_SUCCESS, LOAD_BOX3_COMPLETE, WEB3_LOADED } from "../s
 const FLOW_CREATE_GROUP = 'FLOW_CREATE_GROUP'
 const WEB3_LOADING = 'WEB3_LOADING'
 const BOX3_LOADING = 'BOX3_LOADING'
+export const FLOW_LOAD_SPACE = 'FLOW_LOAD_SPACE'
 
 const initialState = {
     [FLOW_CREATE_GROUP]: {
@@ -10,6 +11,9 @@ const initialState = {
     },
     [WEB3_LOADING]: true,
     [BOX3_LOADING]: true,
+    [FLOW_LOAD_SPACE]: {
+        error: null
+    },
     chainId: null
 }
 
@@ -36,6 +40,13 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 [BOX3_LOADING]: false
+            }
+        case 'OPEN_SPACE_FAILED':
+            return {
+                ...state,
+                FLOW_LOAD_SPACE: {
+                    error: action.payload.reason
+                }
             }
         default:
             return state

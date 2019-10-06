@@ -15,6 +15,7 @@ import { format } from "util";
 import { Router } from "next/router";
 
 import LoggedInUser from '../atoms/LoggedInUser'
+import Head from "next/head";
 
 
 export const MEMBERSHIP_TYPE_TOKEN = 'token'
@@ -165,6 +166,9 @@ function Page({ createSpace, form }) {
     }
 
     return <PageTemplate className="container">
+        <Head>
+            <title>My Spaces</title>
+        </Head>
         <Layout>
             <header>
                 <LoggedInUser withDropdown={true}/> 

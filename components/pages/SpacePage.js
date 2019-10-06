@@ -1,6 +1,6 @@
 import Box from '3box';
 import React, { Component, useState, useEffect } from "react";
-import { Card, ListGroup, Button } from 'react-bootstrap';
+import { Card, ListGroup, Button, Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import styled from 'styled-components';
@@ -42,78 +42,7 @@ flex: 1;
 
 
 
-
-
-
-const Members = ({ posts }) => {
-    let members = getMembers(posts)
-    return <div>
-        {
-            members.map(did => <LazyProfileTile did={did}/>)
-        }
-    </div>
-}
-
-import Post from '../atoms/Post';
-
-class SpacePage extends Component {
-    state = {
-        thread: null,
-        posts: null,
-        postThingKey: 0,
-        view: 0
-    }
-
-    async componentDidMount() {
-        const { addr } = this.props
-        this.props.loadSpace(addr)
-    }
-
-    render() {
-        const { space, thread } = this.state
-        const { addr, submitThing } = this.props
-        const { name, posts } = this.props.space
-
-        // const name = space && space.name || 'unnamed'
-        const { view, postThingKey } = this.state
-
-        const views = {
-            home: 0,
-            members: 1,
-            about: 2
-        }
-
-        let content
-        switch(view) {
-            case views.home:
-                content = <Feed submitThing={(text) => {
-                    submitThing(addr, 'chat', text)
-                }} {...{ thread, posts }}/>
-                break
-            case views.members:
-                content = <Members {...{ posts }}/>
-                break;
-            case views.about:
-                content = <div>
-                    This space exists at {this.props.addr}.
-                </div>
-                break;
-        }
-
-        return <PageTemplate>
-            <div className={css.page}>
-            
-            <header>
-                <a href="/spaces">{`<<`} Back to spaces</a>
-            </header>
-            
-            <h1>
-                {/* <Button variant="primary">Join</Button>&nbsp; */}
-                {name}
-            </h1>
-            
-            <Layout>
-                <div className='right'>
+                {/* <div className='right'>
                     <Card>
                         <ListGroup style={{ width: '18rem' }} variant="flush" className='menuitems'>
                             <ListGroup.Item action onClick={() => this.setState({ view: views.home })} active={view == views.home}>
@@ -129,12 +58,103 @@ class SpacePage extends Component {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-                </div>
+                </div> */}
 
-                <div className='left'>
-                    {content}
+
+
+const Members = ({ posts }) => {
+    let members = getMembers(posts)
+    return <div>
+        {
+            members.map(did => <LazyProfileTile did={did}/>)
+        }
+    </div>
+}
+
+import Post from '../atoms/Post';
+import Head from 'next/head';
+import { FLOW_LOAD_SPACE } from '../../reducers/flows';
+
+class SpacePage extends Component {
+    state = {
+        view: 0
+    }
+
+    async componentDidMount() {
+        const { addr } = this.props
+        this.props.loadSpace(addr)
+    }
+
+    render() {
+        const { addr, submitThing, space, error } = this.props
+        
+        let name = space.name || 'Loading...'
+        let posts = space.posts || []
+        
+        const { view } = this.state
+        const views = {
+            home: 0,
+            members: 1,
+            about: 2
+        }
+
+        let content
+        switch(view) {
+            case views.home:
+                content = <Feed submitThing={(text) => {
+                    submitThing(addr, 'chat', text)
+                }} {...{ posts, space }}/>
+                break
+            case views.members:
+                content = <Members {...{ posts }}/>
+                break;
+            case views.about:
+                content = <div>
+                    This space exists at {this.props.addr}.
                 </div>
+                break;
+        }
+
+        return <PageTemplate>
+            <Head>
+                <title>{name}</title>
+            </Head>
+
+            <div className={css.page}>
             
+            <header>
+                <a href="/spaces">{`<<`} Back to spaces</a>
+            </header>
+
+            <Modal
+                size="lg"
+                show={error}
+                >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                    Couldn't load space!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        {error}
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button >Close</Button>
+                </Modal.Footer>
+                </Modal>
+
+            <Layout>
+                <div className='left'>
+                    <Feed 
+                        space={this.props.space} 
+                        submitThing={(text) => {
+                            submitThing(addr, 'chat', text)
+                        }} 
+                        posts={posts}
+                    />
+                </div>
             </Layout>
             </div>
             
@@ -145,8 +165,8 @@ class SpacePage extends Component {
 
 function mapStateToProps(state, props) {
     return {
-        space: state.spaces.data[props.addr],
-        profiles: state.spaces.profiles
+        space: state.spaces[props.addr] || {},
+        error: state.flows['FLOW_LOAD_SPACE'].error
     }
 }
 
