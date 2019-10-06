@@ -140,9 +140,9 @@ class SpacePage extends Component {
                         {error}
                     </p>
                 </Modal.Body>
-                <Modal.Footer>
+                {/* <Modal.Footer>
                     <Button >Close</Button>
-                </Modal.Footer>
+                </Modal.Footer> */}
                 </Modal>
 
             <Layout>

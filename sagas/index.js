@@ -12,6 +12,13 @@ import {
     fetchProfile, getEthereumAddress
 } from './profiles'
 
+
+
+
+
+
+
+
 let provider
 let signer 
 let myAddress
@@ -153,46 +160,36 @@ export function* createGroup({ payload }) {
         type: CREATE_GROUP_WEB3_BEGIN
     })
 
-    const artifact = getArtifact('SpaceCadetFactory')
-    const addr = yield call(getDeployment, artifact)
-    const contract = new ethers.Contract( 
-        addr, 
-        artifact.abi, 
-        signer
-    )
-    
-    let tx
+    // let tx
+    // if(membershipType == MEMBERSHIP_TYPE_TOKEN) {
+    //     tx = yield call(
+    //         contract.functions.createTokenSpace,
+    //         name,
+    //         addressDetails[0]
+    //     )
+    // } else if(membershipType == MEMBERSHIP_TYPE_INVITE) {
+    //     tx = yield call(
+    //         contract.functions.createPersonalSpace,
+    //         name,
+    //         addressDetails
+    //     )
+    // }
 
-    if(membershipType == MEMBERSHIP_TYPE_TOKEN) {
-        tx = yield call(
-            contract.functions.createTokenSpace,
-            name,
-            addressDetails[0]
-        )
-    } else if(membershipType == MEMBERSHIP_TYPE_INVITE) {
-        tx = yield call(
-            contract.functions.createPersonalSpace,
-            name,
-            addressDetails
-        )
-    }
+    let tokenAddr = addressDetails[0]
+    // let receipt = yield call(tx.wait)
+    // let spaceEvent = receipt.events.pop()
 
-    let receipt = yield call(tx.wait)
-    let spaceEvent = receipt.events.pop()
-
-    let { args } = spaceEvent
-    let { space } = args;
+    // let { args } = spaceEvent
+    // let { space } = args;
     
     yield put({
         type: CREATE_GROUP_WEB3_SUCCESS,
         payload: {
             name,
-            space,
+            space: tokenAddr, // TODO(liamz)
             chainId
         }
     })
-
-    // yield loadSpace(space)
 }
 
 export function* loadSpaces() {
@@ -221,22 +218,16 @@ export async function openSpace(addr) {
 
 let spaceContracts = {}
 
-
+// TODO use supportsInterface https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
 function getSpaceContract(addr) {
     let contract = spaceContracts[addr]
     
     if(!contract) {
-        const artifact = getArtifact('ISpace')
+        const artifact = getArtifact('ERC20Detailed')
         contract = new web3.eth.Contract(
             artifact.abi,
             addr
         )
-
-        // contract = new ethers.Contract( 
-        //     addr, 
-        //     artifact.abi,
-        //     signer
-        // )
     }
 
     return contract
@@ -248,17 +239,12 @@ export function* loadSpace({ payload }) {
 
     yield call(loadBox3)
 
-
     // Check if space is valid on current network
     const contract = getSpaceContract(addr)
     try {
-        console.log(contract)
-        // yield call(
-        //     contract.methods.isMember.call,
-        //     '0x0000000000000000000000000000000000000000'
-        // )
+        // TODO supportsInterface
         yield call(() => {
-            return contract.methods.isMember('0x0000000000000000000000000000000000000000').call()
+            return contract.methods.balanceOf('0x0000000000000000000000000000000000000000').call()
         })
     } catch(ex) {
         yield put({
@@ -270,43 +256,32 @@ export function* loadSpace({ payload }) {
         throw ex
     }
 
-    // get the space name
-    const artifact = getArtifact('SpaceCadetFactory')
-    const spaceCadetFactory_addr = yield call(getDeployment, artifact)
-    const spaceCadetFactory = new web3.eth.Contract(
-        artifact.abi,
-        spaceCadetFactory_addr
-    )
 
-    const evs = yield call(() => spaceCadetFactory.getPastEvents(
-        'NewSpace',
-        {
-            filter: {
-                space: addr
-            },
-            fromBlock: '0',
-            toBlock: 'latest'
-        }
-    ))
-    if(evs.length == 0) {
-        yield put({
-            type: 'OPEN_SPACE_FAILED',
-            payload: {
-                reason: "Couldn't retrieve the name for this space, from the SpaceCadetFactory"
-            }
-        })
-        throw ex
-    }
-    const ev = evs[0]
-    const { name } = ev.returnValues
+    const name = yield call(() => {
+        return contract.methods.name().call()
+    })
+    // const evs = yield call(() => spaceCadetFactory.getPastEvents(
+    //     'NewSpace',
+    //     {
+    //         filter: {
+    //             space: addr
+    //         },
+    //         fromBlock: '0',
+    //         toBlock: 'latest'
+    //     }
+    // ))
+    // if(evs.length == 0) {
+    //     yield put({
+    //         type: 'OPEN_SPACE_FAILED',
+    //         payload: {
+    //             reason: "Couldn't retrieve the name for this space, from the SpaceCadetFactory"
+    //         }
+    //     })
+    //     throw ex
+    // }
+    // const ev = evs[0]
+    // const { name } = ev.returnValues
     
-    // const addr = yield call(getDeployment, artifact)
-    // const spaceCadetFactory = new ethers.Contract( 
-    //     addr, 
-    //     artifact.abi, 
-    //     signer
-    // )
-
     const seen = yield select(state => state.spaces[addr])
     if(!seen) {
         yield put({
@@ -384,12 +359,9 @@ export function* loadPosts({ payload }) {
         let ethAddress = yield call(getEthereumAddress, did, profile)
 
         // check membership
-        // TODO(liamz) fully implement contract-wise
-        console.log(ethAddress)
-
         let isMember = yield call(async () => {
-            const res = await contract.methods.isMember(ethAddress).call()
-            return res
+            const res = new web3.utils.BN(await contract.methods.balanceOf(ethAddress).call())
+            return !res.eq(new web3.utils.BN(0))
         })
         if(isMember) newMembers.push({ did, ethAddress })
     }
@@ -404,11 +376,14 @@ export function* loadPosts({ payload }) {
         }
     })
 
+    // Filter posts by members
+    const posts2 = posts.filter(post => members2.map(({ did }) => did).indexOf(post.author) !== -1)
+
     yield put({
         type: SPACE_LOAD_POSTS_SUCCESS,
         payload: {
             addr: spaceAddress,
-            posts,
+            posts: posts2,
         }
     })
 
