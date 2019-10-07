@@ -9,7 +9,6 @@ import { box } from "../../sagas";
 import LazyProfileTile from "../atoms/LazyProfileTile";
 import PageTemplate from "./PageTemplate";
 import css from "./space.less";
-import PostThing from '../atoms/PostThing';
 import { filterPosts, getMembers } from '../../selectors';
 import { BasicSpinner } from '../atoms/BasicSpinner'
 import Feed from '../atoms/Feed'
@@ -101,9 +100,10 @@ class SpacePage extends Component {
         let content
         switch(view) {
             case views.home:
-                content = <Feed submitThing={(text) => {
-                    submitThing(addr, 'chat', text)
-                }} {...{ posts, space }}/>
+                // content = <Feed submitThing={(text) => {
+                //     submitThing(addr, 'chat', text)
+                // }} {...{ posts, space }}/>
+                
                 break
             case views.members:
                 content = <Members {...{ posts }}/>
@@ -123,7 +123,10 @@ class SpacePage extends Component {
             <div className={css.page}>
             
             <header>
-                <a href="/spaces">{`<<`} Back to spaces</a>
+                <a href="/spaces">
+                {/* {`<<`}  */}
+                <i class="fas fa-arrow-circle-left"></i> Back to spaces
+                </a>
             </header>
 
             <Modal

@@ -1,0 +1,82 @@
+{
+  "contractName": "Enofti",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/liamz/Documents/open-source/everest/fundao/contracts/experiments/enofti/Enofti.sol\":\"Enofti\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/liamz/Documents/open-source/everest/fundao/contracts/experiments/enofti/Enofti.sol\":{\"keccak256\":\"0x451daf59a9b81e9f421bf25939553c0cdecd3765f391642d96dbd36048bac3d1\",\"urls\":[\"bzzr://3cd1d6b9255fdda8f2f7370b4bc65124e8b4dc62a0f102a8c9186361ccf3d2f8\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3fe6080604052600080fdfea165627a7a72305820b101843f228178d8ffa6b7f0d2ea5c7c0a4595df96a5191452baf04562c69eb80029",
+  "deployedBytecode": "0x6080604052600080fdfea165627a7a72305820b101843f228178d8ffa6b7f0d2ea5c7c0a4595df96a5191452baf04562c69eb80029",
+  "sourceMap": "0:24:6:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;0:24:6;;;;;;;",
+  "deployedSourceMap": "0:24:6:-;;;;;",
+  "source": "contract Enofti {\n    \n}",
+  "sourcePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/experiments/enofti/Enofti.sol",
+  "ast": {
+    "absolutePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/experiments/enofti/Enofti.sol",
+    "exportedSymbols": {
+      "Enofti": [
+        328
+      ]
+    },
+    "id": 329,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 328,
+        "linearizedBaseContracts": [
+          328
+        ],
+        "name": "Enofti",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 329,
+        "src": "0:24:6"
+      }
+    ],
+    "src": "0:24:6"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/experiments/enofti/Enofti.sol",
+    "exportedSymbols": {
+      "Enofti": [
+        328
+      ]
+    },
+    "id": 329,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 328,
+        "linearizedBaseContracts": [
+          328
+        ],
+        "name": "Enofti",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 329,
+        "src": "0:24:6"
+      }
+    ],
+    "src": "0:24:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.13",
+  "updatedAt": "2019-10-06T22:24:15.788Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

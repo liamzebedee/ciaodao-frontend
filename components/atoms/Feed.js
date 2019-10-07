@@ -6,14 +6,14 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router'
 
 
-import { Modal, Button, Form, ButtonGroup, Card } from 'react-bootstrap'
+import { Modal, Button, Form, ButtonGroup, Card, Dropdown } from 'react-bootstrap'
 import Link from 'next/link'
 import { bindActionCreators } from "redux";
 
 import { format } from "util";
 import { Router } from "next/router";
 
-import { submitThing } from '../../actions'
+import { submitThing, toggleSaved } from '../../actions'
 
 
 import css from "../pages/space.less";
@@ -24,20 +24,57 @@ import Web3Wrapper from "../wrapper/Web3Wrapper";
 import Box3Wrapper from "../wrapper/Box3Wrapper";
 import { BasicSpinner } from "./BasicSpinner";
 
-const Feed = ({ space, submitThing, posts }) => {
-    const [postThingKey, setPostThingKey] = useState(0)
+// TOGGLE_SPACE_SAVED
+
+const Feed = ({ space, submitThing, posts, postThingKey, toggleSaved }) => {
+    // const [postThingKey, setPostThingKey] = useState(0)
+ 
+    const [showMenu, setShowMenu] = useState(false)
 
     return <div className={css.feed}>
-        <div className={`heading`}>
+        <div className={`${css.card} heading`}>
+        
             <h3 className='title'>{space.name}</h3>
+            
+
+            <Dropdown className={'dropdown'} drop="down" alignRight show={showMenu} onToggle={(isOpen) => {
+                setShowMenu(isOpen)
+            }}>
+                {/* <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
+                    <i class="fas fa-ellipsis-v"></i>
+                </Dropdown.Toggle> */}
+                <div onClick={() => setShowMenu(!showMenu)} className="toggleEllipsis rounded mr-2">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+
+                <Dropdown.Menu >
+                    <Dropdown.Item onClick={() => toggleSaved(!space.saved)}>
+                        {
+                            space.saved 
+                            ? <><i class="fas fa-star"></i> Unfavourite</>
+                            : <><i class="far fa-star"></i> Favourite</>
+                        }
+                    </Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+            
+            {/* <div>
+            <Button size="sm" variant="primary">
+                Save
+            </Button>
+            </div> */}
+
             {/* <BasicSpinner loading={1}/> */}
         </div>
 
-        <div className={`${css.composer} composer`}>
+        <div className={`${css.card} ${css.composer} composer`}>
             <PostThing key={postThingKey} submitThing={async (message) => {
                 try { 
                     submitThing(message)
-                    setPostThingKey(postThingKey+1)
+                    // setTimeout(() => {
+                    //     setPostThingKey(postThingKey+1)
+                    // })
+                    
                 }
                 catch(ex) {
                     console.error(ex)
@@ -45,29 +82,40 @@ const Feed = ({ space, submitThing, posts }) => {
             }}/>
         </div>
         
-        { posts
+        
+        { 
+        posts.length
         ? filterPosts(posts).map(post => <Post key={post.postId} {...post}/>)
-        : null }        
+        : <div className={css.nothingHere}>
+            {/* <i class="fas fa-smile-wink"></i> */}
+            {/* <i class="fas fa-door-open"></i> */}
+            {/* <i class="far fa-stars"></i> */}
+            <i className={`${css.starryNight} icon-starry-night`}></i>
+            <p>This space looks a bit empty.</p>
+            {/* <br/><i>Why not make some noise?</i> */}
+            {/* Looks like you've stumbled upon an empty space. */}
+        </div> 
+        }        
 
         <footer></footer>
     </div>
 }
 
-export default Feed
+// export default Feed
 
-// function mapStateToProps(state, props) {
-//     return {
-//         space: state.spaces[props.addr],
-//         profiles: state.spaces.profiles
-//     }
-// }
+function mapStateToProps(state, props) {
+    return {
+        postThingKey: state.flows.FLOW_SUBMIT_THING.id
+    }
+}
 
-// function mapDispatchToProps(dispatch) {
-//     return bindActionCreators(
-//         {
-//         },
-//         dispatch
-//     )
-// }
+function mapDispatchToProps(dispatch, props) {
+    return bindActionCreators(
+        {
+            toggleSaved: (saved) => toggleSaved(props.space.ethAddress, saved)
+        },
+        dispatch
+    )
+}
 
-// export default connect(mapStateToProps, mapDispatchToProps)(Feed)
+export default connect(mapStateToProps, mapDispatchToProps)(Feed)

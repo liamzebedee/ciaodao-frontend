@@ -256,37 +256,15 @@ export function* loadSpace({ payload }) {
         throw ex
     }
 
-
     const name = yield call(() => {
         return contract.methods.name().call()
     })
-    // const evs = yield call(() => spaceCadetFactory.getPastEvents(
-    //     'NewSpace',
-    //     {
-    //         filter: {
-    //             space: addr
-    //         },
-    //         fromBlock: '0',
-    //         toBlock: 'latest'
-    //     }
-    // ))
-    // if(evs.length == 0) {
-    //     yield put({
-    //         type: 'OPEN_SPACE_FAILED',
-    //         payload: {
-    //             reason: "Couldn't retrieve the name for this space, from the SpaceCadetFactory"
-    //         }
-    //     })
-    //     throw ex
-    // }
-    // const ev = evs[0]
-    // const { name } = ev.returnValues
     
     const seen = yield select(state => state.spaces[addr])
     if(!seen) {
         yield put({
             type: 'INIT_SPACE',
-            payload: { addr, name }
+            payload: { addr, name, chainId }
         })
     }
 
@@ -427,7 +405,7 @@ export function* submitThing({ payload }) {
     yield call(() => thread.post(text))
     
     yield put({
-        type: 'foo'
+        type: 'SUBMIT_THING_SUCCESS'
     })
 }
 

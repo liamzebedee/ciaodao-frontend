@@ -4,6 +4,7 @@ const FLOW_CREATE_GROUP = 'FLOW_CREATE_GROUP'
 const WEB3_LOADING = 'WEB3_LOADING'
 const BOX3_LOADING = 'BOX3_LOADING'
 export const FLOW_LOAD_SPACE = 'FLOW_LOAD_SPACE'
+export const FLOW_SUBMIT_THING = 'FLOW_SUBMIT_THING'
 
 const initialState = {
     [FLOW_CREATE_GROUP]: {
@@ -13,6 +14,9 @@ const initialState = {
     [BOX3_LOADING]: true,
     [FLOW_LOAD_SPACE]: {
         error: null
+    },
+    [FLOW_SUBMIT_THING]: {
+        id: +new Date,
     },
     chainId: null
 }
@@ -44,10 +48,18 @@ export default function(state = initialState, action) {
         case 'OPEN_SPACE_FAILED':
             return {
                 ...state,
-                FLOW_LOAD_SPACE: {
+                [FLOW_LOAD_SPACE]: {
                     error: action.payload.reason
                 }
             }
+        case 'SUBMIT_THING_SUCCESS': {
+            return {
+                ...state,
+                [FLOW_SUBMIT_THING]: {
+                    id: +new Date,
+                }
+            }
+        }
         default:
             return state
     }

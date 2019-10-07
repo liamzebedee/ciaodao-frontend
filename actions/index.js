@@ -77,3 +77,13 @@ export function logout() {
         type: USER_LOGOUT_BEGIN
     }
 }
+
+export function toggleSaved(ethAddress, saved) {
+    return {
+        type: 'TOGGLE_SPACE_SAVED',
+        payload: {
+            ethAddress,
+            saved
+        }
+    }
+}

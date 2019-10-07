@@ -3,10 +3,11 @@ import { getProfile, getEthAddress } from "../../selectors"
 import { bindActionCreators } from "redux"
 import { connect } from 'react-redux'
 import spotifyStyleTime from 'spotify-style-times'
+import css from "../pages/space.less";
 
 const Post = ({ timestamp, message, postId, author, ethAddress, profile }) => {
     const humanTime = spotifyStyleTime(new Date(timestamp*1000))
-    return <div className='post' key={postId}>
+    return <div className={`${css.card} post`} key={postId}>
         <div className='left'>
             <LazyProfileTile did={author}/>
         </div>

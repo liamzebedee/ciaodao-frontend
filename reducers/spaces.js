@@ -7,6 +7,7 @@ class Space {
     chainId = -1
     members = []
     posts = []
+    saved = false
 }
 
 const theLobby = new Space()
@@ -30,6 +31,7 @@ export default function reduce(state = initialState, action) {
             newSpace.name = name
             newSpace.ethAddress = ethAddress
             newSpace.chainId = chainId
+            newSpace.saved = true
 
             return Immutable.set(
                 state, 
@@ -42,10 +44,19 @@ export default function reduce(state = initialState, action) {
             let space = new Space
             space.ethAddress = ethAddress
             space.name = action.payload.name
+            space.chainId = action.payload.chainId
             return Immutable.set(
                 state, 
                 ethAddress, 
                 space
+            )
+        }
+        case 'TOGGLE_SPACE_SAVED': {
+            const { ethAddress, saved } = action.payload
+            return Immutable.setIn(
+                state, 
+                [ethAddress, 'saved'], 
+                saved
             )
         }
         case SPACE_LOAD_POSTS_SUCCESS: {

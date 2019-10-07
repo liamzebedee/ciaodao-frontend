@@ -184,9 +184,9 @@ function Page({ createSpace, form }) {
                     setShowCreateSpaceModal(true)
                 }}>Create space</Button> 
                 
-                <Button variant="secondary" onClick={() => {
+                {/* <Button variant="secondary" onClick={() => {
                     setShowSearchSpacesModal(true)
-                }}>Find spaces</Button>
+                }}>Find spaces</Button> */}
             </ButtonToolbar>
             
 
