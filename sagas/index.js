@@ -3,7 +3,7 @@ import { eventChannel, END } from 'redux-saga'
 import Box from '3box';
 import Router from 'next/router'
 import { persistor } from '../pages/_app';
-import Web3 from 'web3';
+
 import { ethers, ContractFactory } from 'ethers';
 import { MEMBERSHIP_TYPE_TOKEN, MEMBERSHIP_TYPE_INVITE } from '../components/pages/SpacesPage';
 import { submitThing } from '../actions';
@@ -87,7 +87,7 @@ export function* loadWeb3() {
     const addresses = yield call(window.ethereum.enable)
     myAddress = addresses[0];
     // provider = new ethers.providers.Web3Provider(window.ethereum);
-    provider = new ethers.providers.Web3Provider(web3.currentProvider)
+    provider = new ethers.providers.Web3Provider(window.ethereum)
     signer = provider.getSigner(0);
     // yield call(() => new Promise((res,rej) => {
     //     provider.on('ready', res)
