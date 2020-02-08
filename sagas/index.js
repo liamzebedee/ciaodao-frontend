@@ -8,6 +8,8 @@ import { ethers, ContractFactory } from 'ethers';
 import { MEMBERSHIP_TYPE_TOKEN, MEMBERSHIP_TYPE_INVITE } from '../components/pages/SpacesPage';
 import { submitThing } from '../actions';
 import { getMembers } from '../selectors';
+import axios from 'axios'
+import { API_URL } from '../lib/config';
 
 let provider
 let signer 
@@ -29,6 +31,10 @@ export const WEB3_LOADED = 'WEB3_LOADED'
 export const BOX3_LOADED = 'BOX3_LOADED'
 export const LOAD_BOX3_PENDING = 'LOAD_BOX3_PENDING'
 export const LOAD_BOX3_COMPLETE = 'LOAD_BOX3_COMPLETE'
+export const LOGIN_START = 'LOGIN_START'
+export const LOGIN_COMPLETE = 'LOGIN_COMPLETE'
+export const LOGOUT = 'LOGOUT'
+export const LOGOUT_COMPLETE = 'LOGOUT_COMPLETE'
 
 export const VISIT_SPACES = 'VISIT_SPACES'
 
@@ -107,15 +113,88 @@ export function* loadWeb3() {
     })
 }
 
+export function* login() {
+    yield call(loadBox3)
+
+    yield call(async () => {
+        await box.linkAddress()
+        console.log(`ETH address linked`)
+
+        // await box.syncDone
+        // console.log(`3Box sync done`)
+
+        const links = await box.listAddressLinks()
+        if(!links.length) {
+            throw new Error("Ethereum address not linked to 3Box profile, or proofs cannot be found.")
+        }
+
+        // Authenticate.
+        const jwt = await ciaoWrapMessage({
+            links
+        })
+
+        try {
+            const response = await axios.post(`${API_URL}/users/authenticate`, { jwt })
+            console.debug(response)
+        } catch(ex) {
+            console.error(ex)
+        }
+    })
+
+    yield put({
+        type: LOGIN_COMPLETE
+    })
+}
+
+export function* logout() {
+    yield put({
+        type: LOGOUT_COMPLETE
+    })
+}
+
 export function* loadBox3() {
     yield put({
         type: LOAD_BOX3_PENDING
     })
-    
-    // get my box and profile
-    box = yield call(Box.openBox, myAddress, window.ethereum, {})
+
+    box = yield call(Box.openBox, myAddress, window.ethereum)
     const myProfile = yield call(Box.getProfile, myAddress)
+
+    // yield call(authenticateToCiaoDao)
+    yield call(async () => {
+        await box.linkAddress()
+        console.log(`ETH address linked`)
+
+        // await box.syncDone
+        // console.log(`3Box sync done`)
+
+        const links = await box.listAddressLinks()
+        if(!links.length) {
+            throw new Error("Ethereum address not linked to 3Box profile, or proofs cannot be found.")
+        }
+
+        // Authenticate.
+        const jwt = await ciaoWrapMessage({
+            links
+        })
+
+        try {
+            const response = await axios.post(`${API_URL}/users/authenticate`, { jwt })
+            console.debug(response)
+        } catch(ex) {
+            console.error(ex)
+        }
+    })
+
+    // Now we can sign messages to go out to the server.
+    // We identify the user solely by their DID,
+    // since this contains claims of links to their Ethereum addresses.
+
+    // verifyJWT
+    // signJWT
+
     const myDid = box.DID
+    fetchProfile({ did: myDid })
 
     yield put({
         type: LOAD_BOX3_COMPLETE,
@@ -123,13 +202,27 @@ export function* loadBox3() {
             // box,
             myProfile,
             myAddress,
-            myDid,
-            loggedIn: true
+            myDid
             // box, myProfile, myAddress
         }
     })
 
     yield call(persistor.flush)
+}
+
+/**
+ * Ciaodao uses a very dumb client-server protocol integrated with 3Box's decentralized claims.
+ * 
+ * Messages are sent over HTTP, encapsulated in an envelope of a "claim". 
+ * Claim isn't semantically the correct term, however it is the term used by DID-JWT.
+ * Basically each message is signed by the user's DID, encapsulated in a JSON Web Token.
+ * 
+ * All HTTP REST endpoints accept a parameter "jwt", which contains a JWT Claim.
+ */
+
+async function ciaoWrapMessage(message) {
+    let jwt = await box._3id.signJWT({ message })
+    return jwt
 }
 
 export function* visitSpaces() {
@@ -319,10 +412,11 @@ export function* fetchProfile({ payload: { did } }) {
 export default function* () {
     yield takeLatest(LOAD_WEB3, loadWeb3)
     yield takeLatest(LOAD_BOX3, loadBox3)
+    yield takeLatest(LOGIN_START, login)
     yield takeLatest(VISIT_SPACES, visitSpaces)
     yield takeLatest(CREATE_GROUP, createGroup)
-    yield takeLatest(SPACES_LOAD, loadSpaces)
-    yield takeLatest(SUBMIT_THING, submitThing)
-    yield takeLatest(LOAD_POSTS, loadPosts)
+    // yield takeLatest(SPACES_LOAD, loadSpaces)
+    // yield takeLatest(LOAD_POSTS, loadPosts)
     yield takeEvery(FETCH_PROFILE, fetchProfile)
+    yield takeEvery(LOGOUT, logout)
 }

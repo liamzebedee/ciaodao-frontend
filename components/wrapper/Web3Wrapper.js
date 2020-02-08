@@ -3,6 +3,7 @@ import { loadWeb3 } from "../../actions";
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 
+import { MyLoader } from "../atoms/MyLoader";
 
 
 class Web3Wrapper extends Component {
@@ -13,9 +14,9 @@ class Web3Wrapper extends Component {
     render() {
         let { loading } = this.props
         return <div>
-            {loading 
+        {loading 
             ? this.props.children
-            : '...'
+            : <MyLoader/>
             }
         </div>
     }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import styled from 'styled-components';
 import PageTemplate from "./PageTemplate"
 
-import { loadBox3, visitSpaces } from '../../actions'
+import { loadBox3, visitSpaces, login, logout } from '../../actions'
 
 const AppTitle = styled.h1`
     text-transform: lowercase;
@@ -138,8 +138,12 @@ import LoggedInUser from "../atoms/LoggedInUser";
 
 
 
-function LandingPage({ loadBox3, data, visitSpaces }) {
-    const { loadingWeb3, loadingBox3, loggedIn, myAddress } = data
+function LandingPage({ loadBox3, login, logout, data, visitSpaces }) {
+    const { 
+        loadingWeb3, loadingBox3, 
+        loggedIn, 
+        myAddress 
+    } = data
 
     return <PageTemplate>
         <HeroBlock>
@@ -152,8 +156,9 @@ function LandingPage({ loadBox3, data, visitSpaces }) {
                 ? <div>
                     Logged in as <LoggedInUser/>
                     <button type="button" className="btn btn-success" onClick={visitSpaces}>Visit my spaces</button>
+                    <button type="button" className="btn btn-outline" onClick={logout}>Logout</button>
                 </div> 
-                : <button type="button" className={`btn btn-primary`} disabled={loadingBox3} onClick={loadBox3}>Connect with 3Box</button> 
+                : <button type="button" className={`btn btn-primary`} disabled={loadingBox3} onClick={login}>Connect with 3Box</button> 
             }
             
         </center>
@@ -178,7 +183,8 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
         {
-            loadBox3,
+            login,
+            logout,
             visitSpaces
         },
         dispatch

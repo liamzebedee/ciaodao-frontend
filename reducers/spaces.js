@@ -1,12 +1,7 @@
 import { CREATE_GROUP_WEB3_SUCCESS, SPACE_LOAD_SUCCESS, SPACE_LOAD_POSTS_SUCCESS } from "../sagas";
 
 const initialState = {
-    data: {
-        '0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9': new Space('0x68cCe7ad9beDf41BEE8A7D1b758EDBb8AEeFb1b9', 'The Lobby', null, 3)
-    },
-    profiles: {},
-    createdSpaces: [
-    ],
+    data: []
 }
 
 function Space(addr, name, thread, chainId) {

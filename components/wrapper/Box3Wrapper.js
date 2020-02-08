@@ -4,6 +4,7 @@ import React, { Component } from "react";
 import { loadBox3 } from "../../actions";
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
+import { MyLoader } from "../atoms/MyLoader";
 
 
 
@@ -15,9 +16,9 @@ class Box3Wrapper extends Component {
     render() {
         let { loading } = this.props
         return <div>
-            {loading 
+        {loading 
             ? this.props.children
-            : '...'
+            : <MyLoader/>
             }
         </div>
     }

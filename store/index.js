@@ -12,7 +12,9 @@ const persistConfig = {
     key: 'root',
     storage,
     blacklist: [
-        'flows'
+        'flows',
+        'spaces',
+        // 'data'
     ]
 }
 

@@ -41,10 +41,18 @@ flex: 1;
 `
 
 
+import { MyLoader } from '../atoms/MyLoader'
 const TEMPORARY_MODERATOR = 'did:muport:QmRTNPefmFga68GnzYPzQR3ZsYYNdQoTVgKCpuBjZQrRTZ'
 
-const Feed = ({ thread, posts }) => {
+const Feed = ({ thread, posts, spaceId }) => {
     const [postThingKey, setPostThingKey] = useState(0)
+
+    const [{ status, response }, makeRequest] = useApiRequest(`${API_URL}/spaces/${spaceId}/messages`, { verb: 'get' })
+
+    useEffect(() => {
+        console.log(`${API_URL}/spaces/${spaceId}/messages`)
+        makeRequest()
+    }, [])
 
     return <div className={css.feed}>
         <div className={`heading`}>
@@ -52,26 +60,23 @@ const Feed = ({ thread, posts }) => {
         </div>
 
         <div className={`${css.composer} composer`}>
-            <PostThing key={postThingKey} submitThing={async (message) => {
-                try { 
-                    await thread.post(message) 
-                    setPostThingKey(postThingKey+1)
-                }
-                catch(ex) {
-                    console.error(ex)
-                }
-            }}/>
+            <PostThing {...{spaceId}}/>
         </div>
+        
+        {status === FETCHING && (
+            <MyLoader/>
+        )}
 
-        { posts
-        ? filterPosts(posts).map(post => <Post key={post.postId} {...post} {...{
-            // address: "0x1cdad033df958291390ba7265be81b84cb6bfcfb"
-        }}/>)
-        : null }
+        {status === SUCCESS && (
+            response.data.map(post => <Post key={post.postId} {...post}/>)
+        )}
+        
 
         <footer></footer>
     </div>
 }
+
+
 
 const Members = ({ posts }) => {
     let members = getMembers(posts)
@@ -83,6 +88,9 @@ const Members = ({ posts }) => {
 }
 
 import Post from '../atoms/Post';
+import useApiRequest from '../../hooks/apiRequest';
+import { API_URL } from '../../lib/config';
+import { FETCHING, SUCCESS } from '../../reducers/loading';
 
 class Page extends Component {
     state = {
@@ -96,37 +104,37 @@ class Page extends Component {
         const { addr } = this.props
         
         // open 3chat space
-        const space = await box.openSpace(addr)
+        // const space = await box.openSpace(addr)
 
-        let myDid = space.DID;
+        // let myDid = space.DID;
 
-        const thread = await space.joinThread('posts', { 
-            members: false,
-            firstModerator: TEMPORARY_MODERATOR
-        })
+        // const thread = await space.joinThread('posts', { 
+        //     members: false,
+        //     firstModerator: TEMPORARY_MODERATOR
+        // })
 
-        this.setState({
-            myDid,
-            space,
-            thread,
-        })
+        // this.setState({
+        //     myDid,
+        //     space,
+        //     thread,
+        // })
 
-        const posts = await thread.getPosts()
+        // const posts = await thread.getPosts()
         
-        this.props.loadPosts(posts, addr)
+        // this.props.loadPosts(posts, addr)
 
-        this.setState({
-            posts
-        })
+        // this.setState({
+        //     posts
+        // })
 
-        thread.onUpdate(async res => {
-            const posts = await thread.getPosts()
-            this.props.loadPosts(posts, addr)
+        // thread.onUpdate(async res => {
+        //     const posts = await thread.getPosts()
+        //     this.props.loadPosts(posts, addr)
 
-            this.setState({
-                posts
-            })
-        })
+        //     this.setState({
+        //         posts
+        //     })
+        // })
     }
 
     // loadPosts = (posts) => {
@@ -142,7 +150,7 @@ class Page extends Component {
 
     render() {
         const { space, thread, posts } = this.state
-        if(!space) return '...'
+        const { spaceId } = this.props
 
         const name = space && space.name || 'unnamed'
         const { view, postThingKey } = this.state
@@ -156,7 +164,7 @@ class Page extends Component {
         let content
         switch(view) {
             case views.home:
-                content = <Feed {...{ thread, posts }}/>
+                content = <Feed {...{ thread, posts, spaceId }}/>
                 break
             case views.members:
                 content = <Members {...{ posts }}/>
@@ -179,13 +187,6 @@ class Page extends Component {
             
             <Layout>
                 <div className='right'>
-                    {/* <Card>
-                        <ListGroup style={{ width: '18rem' }} variant="flush">
-                            <ListGroup.Item>
-                                Member
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Card> */}
                     <Card>
                         <Card.Header>
                             <p>You're not a member.</p>
@@ -220,6 +221,7 @@ class Page extends Component {
 
 function mapStateToProps(state, props) {
     return {
+        spaceId: props.addr,
         space: state.spaces.data[props.addr],
         profiles: state.spaces.profiles
     }

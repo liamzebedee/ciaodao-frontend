@@ -61,6 +61,6 @@ export function getEthAddress(state, did) {
 // Maybe we can list spaces of other networks in future
 // But we should just name them properly for now
 export function selectSpaces(state) {
-    const spaces = _.filter(Object.values(state.spaces.data), { chainId: state.flows.chainId })
-    return spaces
+    // const spaces = _.filter(Object.values(state.spaces.data), { chainId: state.flows.chainId })
+    return state.spaces.data
 }
