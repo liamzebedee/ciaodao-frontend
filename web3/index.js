@@ -5,6 +5,6 @@ import Web3 from 'web3'
 
 // Metamask automatically does gas estimation for us
 // Make sure to connect to local Ganache instance at http://localhost:8545
-const web3 = new Web3(Web3.givenProvider, null, {})
+const web3 = new Web3(window.ethereum, null, {})
 
 export { web3 }

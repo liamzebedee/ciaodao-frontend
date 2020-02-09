@@ -98,11 +98,13 @@ export function* loadWeb3() {
     yield put({
         type: WEB3_LOADING
     })
-    const addresses = yield call(window.ethereum.enable)
+    const addresses = yield call(async () => {
+        return await window.ethereum.enable
+    })
     myAddress = addresses[0];
-    // provider = new ethers.providers.Web3Provider(window.ethereum);
-    provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
-    web3 = new Web3(window.web3.currentProvider)
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    // provider = new ethers.providers.Web3Provider(window.web3.currentProvider)
+    web3 = new Web3(window.ethereum.currentProvider)
 
     signer = provider.getSigner(0);
     // yield call(() => new Promise((res,rej) => {
