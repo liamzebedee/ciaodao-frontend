@@ -64,3 +64,10 @@ export function selectSpaces(state) {
     // const spaces = _.filter(Object.values(state.spaces.data), { chainId: state.flows.chainId })
     return state.spaces.data
 }
+
+export function getMessagesForSpace(state, spaceId) {
+    return _.filter(
+        state.messages,
+        { space: spaceId }
+    )
+}

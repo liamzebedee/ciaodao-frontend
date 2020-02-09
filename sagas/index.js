@@ -56,6 +56,10 @@ export const FETCH_PROFILE = 'FETCH_PROFILE'
 export const FETCH_PROFILE_SUCCESS = 'FETCH_PROFILE_SUCCESS'
 export const FETCH_PROFILE_ETH_ADDRESS_SUCCESS = 'FETCH_PROFILE_ETH_ADDRESS_SUCCESS'
 
+export const POST_MESSAGE = 'POST_MESSAGE'
+export const ADD_MESSAGE = 'ADD_MESSAGE'
+export const MARK_MESSAGE_STATUS = 'MARK_MESSAGE_STATUS'
+
 function getArtifact(name) {
     const artifact = require(`../chain/${name}.json`)
     return artifact
@@ -413,6 +417,62 @@ export function* fetchProfile({ payload: { did } }) {
     */
 }
 
+function* postMessage({ payload }) {
+    const {
+        space,
+        text,
+        time
+    } = payload.message
+
+    const message = {
+        space,
+        text,
+        time
+    }
+
+    let author = yield select(state => state.data.myDid)
+
+    // Sign and post to Ciao node.
+    const jwt = yield call(async () => {
+        return await ciaoWrapMessage({
+            message
+        })
+    })
+
+    const messageId = web3.utils.sha3(jwt)
+    
+    // Optimistic UI.
+    yield put({
+        type: ADD_MESSAGE,
+        payload: {
+            ...message,
+            
+            // Add the author
+            author,
+            messageId,
+
+            status: "sending"
+        }
+    })
+
+    yield call(async () => {
+        try {
+            const response = await axios.post(`${API_URL}/spaces/${space}/messages`, { jwt })
+            console.debug(response)
+        } catch(ex) {
+            console.error(ex)
+        }
+
+    })
+
+    yield put({
+        type: MARK_MESSAGE_STATUS,
+        payload: {
+            messageId,
+            status: "sent"
+        }
+    })
+}
 
 export default function* () {
     yield takeLatest(LOAD_WEB3, loadWeb3)
@@ -422,6 +482,9 @@ export default function* () {
     yield takeLatest(CREATE_GROUP, createGroup)
     // yield takeLatest(SPACES_LOAD, loadSpaces)
     // yield takeLatest(LOAD_POSTS, loadPosts)
+
+    yield takeLatest(POST_MESSAGE, postMessage)
+
     yield takeEvery(FETCH_PROFILE, fetchProfile)
     yield takeEvery(LOGOUT, logout)
 }

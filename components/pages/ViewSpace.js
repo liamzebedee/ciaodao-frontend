@@ -16,7 +16,7 @@ import Post from '../atoms/Post';
 import useApiRequest from '../../hooks/apiRequest';
 import { API_URL } from '../../lib/config';
 import { FETCHING, SUCCESS } from '../../reducers/loading';
-
+import ChatView from './ChatView'
 
 const ViewSpace = ({ addr }) => {
     let [pane, setPane] = useState('home')
@@ -28,43 +28,17 @@ const ViewSpace = ({ addr }) => {
         <div className={css.page}>
         
             <header>
-                <a href="/spaces">{`<<`} Back to spaces</a>
+                <a href="/spaces">
+                    <i class="fas fa-arrow-circle-left"></i> Back to spaces    
+                </a>
             </header>
             
-            <h1>
-                {name}
-            </h1>            
-            
-            <div className={css.layout}>
-                <div className='right'>
-                    <Card>
-                        {/* <Card.Header>
-                            <p>You're not a member.</p>
-                        </Card.Header> */}
-                        <ListGroup style={{ width: '18rem' }} variant="flush" className='menuitems'>
-                            <ListGroup.Item action onClick={() => setPane('home')} active={pane == 'home'}>
-                                <i className="fas fa-home"></i>  Home
-                            </ListGroup.Item>
-
-                            <ListGroup.Item action onClick={() => setPane('members')} active={pane == 'members'}>
-                                <i className="fas fa-user"></i>  Members
-                            </ListGroup.Item>
-
-                            <ListGroup.Item action onClick={() => setPane('about')} active={pane == 'about'}>
-                                <i className="fas fa-info"></i>  About
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Card>
-                </div>
-
-                <div className='left'>
-                    {content}
-                </div>
-            </div>
+            <ChatView spaceId={addr}/>
         </div>
         
     </PageTemplate>
 }
+
 
 
 function mapStateToProps(state, props) {
