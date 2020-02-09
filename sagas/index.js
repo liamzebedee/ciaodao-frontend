@@ -93,7 +93,7 @@ async function syncBox(box) {
     })
 }
 
-let wweb3
+let web3
 export function* loadWeb3() {
     yield put({
         type: WEB3_LOADING
