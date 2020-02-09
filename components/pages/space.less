@@ -8,6 +8,36 @@
     header {
         padding-bottom: 2rem;
     }
+
+    
+    .layout {
+        width: 100%;
+        display: flex;
+        
+        flex: 1;
+        
+        
+        & > .left {
+            flex: .8;
+            padding-top: 1em;
+            
+            max-width: 40em;
+        }
+        & > .right {
+            flex: 0 .2;
+            padding: 1em 0;
+            padding-right: 2em;
+            
+        }
+        .menuitems .fas {
+            width: 20px;
+            text-align: center;
+        }
+
+    }
+
+
+
 }
 
 .feed {

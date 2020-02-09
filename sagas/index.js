@@ -189,6 +189,11 @@ export function* loadBox3() {
     // Now we can sign messages to go out to the server.
     // We identify the user solely by their DID,
     // since this contains claims of links to their Ethereum addresses.
+    const authToken = yield call(async () => {
+        return JSON.stringify(await ciaoWrapMessage({ ciao: 'hello' }))
+    })
+    axios.defaults.headers.common['Authorization'] = authToken
+    console.log(authToken)
 
     // verifyJWT
     // signJWT
@@ -220,7 +225,7 @@ export function* loadBox3() {
  * All HTTP REST endpoints accept a parameter "jwt", which contains a JWT Claim.
  */
 
-async function ciaoWrapMessage(message) {
+export async function ciaoWrapMessage(message) {
     let jwt = await box._3id.signJWT({ message })
     return jwt
 }
@@ -275,7 +280,7 @@ export function* createGroup({ payload }) {
         }
     })
 
-    yield loadSpace(space)
+
 }
 
 export function* loadSpaces() {

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import styled from 'styled-components';
 import { addUserProfile, loadSpace, loadPosts } from '../../actions';
-import { box } from "../../sagas";
+import { box, ciaoWrapMessage } from "../../sagas";
 import LazyProfileTile from "../atoms/LazyProfileTile";
 import PageTemplate from "./PageTemplate";
 import css from "./space.less";
@@ -47,10 +47,15 @@ const TEMPORARY_MODERATOR = 'did:muport:QmRTNPefmFga68GnzYPzQR3ZsYYNdQoTVgKCpuBj
 const Feed = ({ thread, posts, spaceId }) => {
     const [postThingKey, setPostThingKey] = useState(0)
 
-    const [{ status, response }, makeRequest] = useApiRequest(`${API_URL}/spaces/${spaceId}/messages`, { verb: 'get' })
+    const [{ status, response }, makeRequest] = useApiRequest(
+        `${API_URL}/spaces/${spaceId}`, 
+        { 
+            verb: 'get'
+        }
+    )
 
     useEffect(() => {
-        console.log(`${API_URL}/spaces/${spaceId}/messages`)
+        console.log(`${API_URL}/spaces/${spaceId}`)
         makeRequest()
     }, [])
 
@@ -60,7 +65,7 @@ const Feed = ({ thread, posts, spaceId }) => {
         </div>
 
         <div className={`${css.composer} composer`}>
-            <PostThing {...{spaceId}}/>
+            <PostThing {...{spaceId}}/> 
         </div>
         
         {status === FETCHING && (
@@ -68,12 +73,34 @@ const Feed = ({ thread, posts, spaceId }) => {
         )}
 
         {status === SUCCESS && (
-            response.data.map(post => <Post key={post.postId} {...post}/>)
+            <Conversation {...{ spaceId }}/>
         )}
-        
 
         <footer></footer>
     </div>
+}
+
+const Conversation = ({ spaceId }) => {
+    const [{ status, response }, makeRequest] = useApiRequest(
+        `${API_URL}/spaces/${spaceId}/messages`, 
+        { 
+            verb: 'get'
+        }
+    )
+
+    useEffect(() => {
+        makeRequest()
+    }, [])
+
+    return <>
+        {status === FETCHING && (
+            <MyLoader/>
+        )}
+
+        {status === SUCCESS && (
+            response.data.map(post => <Post key={post.postId} {...post}/>)
+        )}
+    </>
 }
 
 
@@ -102,39 +129,6 @@ class Page extends Component {
 
     async componentDidMount() {
         const { addr } = this.props
-        
-        // open 3chat space
-        // const space = await box.openSpace(addr)
-
-        // let myDid = space.DID;
-
-        // const thread = await space.joinThread('posts', { 
-        //     members: false,
-        //     firstModerator: TEMPORARY_MODERATOR
-        // })
-
-        // this.setState({
-        //     myDid,
-        //     space,
-        //     thread,
-        // })
-
-        // const posts = await thread.getPosts()
-        
-        // this.props.loadPosts(posts, addr)
-
-        // this.setState({
-        //     posts
-        // })
-
-        // thread.onUpdate(async res => {
-        //     const posts = await thread.getPosts()
-        //     this.props.loadPosts(posts, addr)
-
-        //     this.setState({
-        //         posts
-        //     })
-        // })
     }
 
     // loadPosts = (posts) => {

@@ -16,48 +16,7 @@ function Space(addr, name, thread, chainId) {
 export default function reduce(state = initialState, action) {
     switch(action.type) {
         case CREATE_GROUP_WEB3_SUCCESS: {
-            const { space, name, thread, chainId } = action.payload
-            const { createdSpaces, data } = state
-            return {
-                ...state,
-                createdSpaces: createdSpaces.concat([ space ]),
-                data: {
-                    ...data,
-                    [space]: new Space(space, name, thread, chainId)
-                }
-            }
-        }
-        case SPACE_LOAD_SUCCESS: {
-            const { addr, thread } = action.payload
-            const { data } = state
-            const space = state.data[addr]
-
-            return {
-                ...state,
-                data: {
-                    ...data,
-                    [addr]: {
-                        ...space,
-                        thread,
-                    }
-                }
-            }
-        }
-        case SPACE_LOAD_POSTS_SUCCESS: {
-            const { addr, posts } = action.payload
-            const { data } = state
-            const space = state.data[addr]
-
-            return {
-                ...state,
-                data: {
-                    ...data,
-                    [addr]: {
-                        ...space,
-                        posts,
-                    }
-                }
-            }
+            return state
         }
         case 'ADD_USER_PROFILE': {
             const { user, profile } = action.payload
