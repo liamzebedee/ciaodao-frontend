@@ -1,4 +1,4 @@
-import { LOAD_BOX3, VISIT_SPACES, CREATE_GROUP, LOAD_WEB3, SUBMIT_THING, SPACES_LOAD, SPACE_LOAD, LOAD_POSTS, FETCH_PROFILE, LOGIN_START, LOGOUT, POST_MESSAGE } from "../sagas";
+import { LOAD_BOX3, VISIT_SPACES, CREATE_GROUP, LOAD_WEB3, SUBMIT_THING, SPACES_LOAD, SPACE_LOAD, LOAD_POSTS, FETCH_PROFILE, LOGIN_START, LOGOUT, POST_MESSAGE, GET_MESSAGES } from "../sagas";
 
 export function loadWeb3() {
     return {
@@ -94,6 +94,15 @@ export function postMessage(message) {
         type: POST_MESSAGE,
         payload: {
             message
+        }
+    }
+}
+
+export function getMessages(spaceId) {
+    return {
+        type: GET_MESSAGES,
+        payload: {
+            spaceId
         }
     }
 }

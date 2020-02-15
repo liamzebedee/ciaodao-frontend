@@ -10,7 +10,12 @@ import { getProfile, getEthAddress } from '../../selectors';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
+
+import css from "./profile-tile.less";
+
 const anonProfile = '/static/anonymous.jpg'
+
+
 
 const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile }) => {
     if(!profile) {
@@ -26,11 +31,10 @@ const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile }) => {
     }
 
     // TODO load ethAddress for any profile in sep reducer
-    return  <div className="profile-tile">
-        <div className="profileTile_info">
-            <a href={profile ? `https://3box.io/${ethAddress}` : ''} disabled={profile} className="profileTile_info_link" target="_blank" rel="noopener noreferrer">
+    return  <div className={css.profileTile}>
+        <div>
+            <a href={profile ? `https://3box.io/${ethAddress}` : ''} disabled={profile} target="_blank" rel="noopener noreferrer">
                 <img
-                style={{ width: 49, height: 49 }}
                 src={profile ? image : anonProfile}
                 className="profile-img"
                 alt="profile"

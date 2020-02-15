@@ -1,4 +1,4 @@
-import { ADD_MESSAGE, MARK_MESSAGE_STATUS } from "../sagas"
+import { ADD_MESSAGE, MARK_MESSAGE_STATUS, GET_MESSAGES_SUCCESS } from "../sagas"
 
 const initialState = []
 
@@ -10,9 +10,15 @@ export default function reduce(state = initialState, action) {
                 action.payload
             ]
         
+        case GET_MESSAGES_SUCCESS:
+            return [
+                ...state,
+                ...action.payload
+            ]
+        
         case MARK_MESSAGE_STATUS:
             return state.map(message => {
-                if(message.messageId == action.payload.messageId) return messageReducer(message)
+                if(message.messageId == action.payload.messageId) return messageReducer(message, action)
                 return message
             })
         

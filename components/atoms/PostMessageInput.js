@@ -9,6 +9,10 @@ const PostMessageInput = ({ onSubmit }) => {
 
     function handleKeyDown(ev) {
         if(ev.key == 'Enter' && !ev.shiftKey) {
+            if(text == '') {
+                ev.preventDefault()
+                return
+            }
             onSubmit({ text })
             setText('')
             ev.preventDefault()

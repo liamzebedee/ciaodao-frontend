@@ -57,6 +57,8 @@ export const FETCH_PROFILE_SUCCESS = 'FETCH_PROFILE_SUCCESS'
 export const FETCH_PROFILE_ETH_ADDRESS_SUCCESS = 'FETCH_PROFILE_ETH_ADDRESS_SUCCESS'
 
 export const POST_MESSAGE = 'POST_MESSAGE'
+export const GET_MESSAGES = 'GET_MESSAGES'
+export const GET_MESSAGES_SUCCESS = 'GET_MESSAGES_SUCCESS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const MARK_MESSAGE_STATUS = 'MARK_MESSAGE_STATUS'
 
@@ -245,7 +247,7 @@ export function* createGroup({ payload }) {
         type: CREATE_GROUP_WEB3_BEGIN
     })
 
-    const artifact = getArtifact('SpaceCadetFactory')
+    const artifact = getArtifact('SpaceFactory')
     const addr = yield call(getDeployment, artifact)
     const contract = new ethers.Contract( 
         addr, 
@@ -283,9 +285,15 @@ export function* createGroup({ payload }) {
             chainId
         }
     })
+}
+
+export function* loadSpace({ spaceId }) {
+    // check if registered members
 
 
 }
+
+
 
 export function* loadSpaces() {
     const spaces = yield select(state => state.spaces.data)
@@ -420,17 +428,17 @@ export function* fetchProfile({ payload: { did } }) {
 function* postMessage({ payload }) {
     const {
         space,
-        text,
+        content,
         time
     } = payload.message
 
     const message = {
         space,
-        text,
+        content,
         time
     }
 
-    let author = yield select(state => state.data.myDid)
+    let myDid = yield select(state => state.data.myDid)
 
     // Sign and post to Ciao node.
     const jwt = yield call(async () => {
@@ -448,7 +456,9 @@ function* postMessage({ payload }) {
             ...message,
             
             // Add the author
-            author,
+            author: {
+                did: myDid
+            },
             messageId,
 
             status: "sending"
@@ -474,6 +484,43 @@ function* postMessage({ payload }) {
     })
 }
 
+export function* getMessages({ payload }) {
+    const { spaceId } = payload
+    // let [state, setState] = useState({
+    //     messages: []
+    // })
+
+    const messages = yield call(async () => {
+        let url = `${API_URL}/spaces/${spaceId}/messages`
+        let res = await axios.get(url)
+        return res.data
+    })
+
+    yield put({
+        type: GET_MESSAGES_SUCCESS,
+        payload: messages.map(message => {
+            return {
+                ...message,
+                space: spaceId
+            }
+        })
+    })
+
+
+    // async function getMessages() {
+    //     let url = `${API_URL}/spaces/${spaceId}/messages`
+
+    //     let res = await axios.get(url)
+        
+    //     console.log(res.data)
+        
+
+    //     setState({
+    //         messages: res.data
+    //     })
+    // }
+}
+
 export default function* () {
     yield takeLatest(LOAD_WEB3, loadWeb3)
     yield takeLatest(LOAD_BOX3, loadBox3)
@@ -484,6 +531,7 @@ export default function* () {
     // yield takeLatest(LOAD_POSTS, loadPosts)
 
     yield takeLatest(POST_MESSAGE, postMessage)
+    yield takeLatest(GET_MESSAGES, getMessages)
 
     yield takeEvery(FETCH_PROFILE, fetchProfile)
     yield takeEvery(LOGOUT, logout)

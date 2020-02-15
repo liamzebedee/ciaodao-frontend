@@ -1,0 +1,51 @@
+.post {
+    display: flex;
+
+    &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border: 20px solid transparent;
+        border-right-color: #00aabb;
+        border-left: 0;
+        border-top: 0;
+        margin-top: -10px;
+        margin-left: -20px;
+    }
+
+    .author {
+        float: left;
+        margin-right: 10px;
+        align-self: flex-end;
+    }
+
+    .profileName {
+        opacity: .8;
+        display: block;
+        font-size: 80%;
+    }
+    
+    .content {
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: inline-block;
+        background: rgb(55, 174, 231);
+        color: white;
+
+        footer {
+            display: inline-block;
+            opacity: 0.7;
+            font-size: 80%;
+            float: right;
+        }
+    }
+
+    margin-bottom: 10px;
+
+    &.selfpost {
+        text-align: left;
+    }
+}

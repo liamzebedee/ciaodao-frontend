@@ -66,8 +66,9 @@ export function selectSpaces(state) {
 }
 
 export function getMessagesForSpace(state, spaceId) {
-    return _.filter(
+    const messages = _.filter(
         state.messages,
         { space: spaceId }
-    )
+    ) 
+    return messages
 }
