@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import makeBlockie from 'ethereum-blockies-base64';
 import Box from '3box';
-import { fetchProfile } from '../../actions'
+import { fetchProfile, showUserProfile } from '../../actions'
 
 import { useState, useEffect } from 'react'
 import { isRegExp } from 'util';
@@ -17,7 +17,7 @@ const anonProfile = '/static/anonymous.jpg'
 
 
 
-const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile }) => {
+const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile, showUserProfile }) => {
     if(!profile) {
         useEffect(() => {
             fetchProfile(did)
@@ -31,15 +31,24 @@ const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile }) => {
     }
 
     // TODO load ethAddress for any profile in sep reducer
-    return  <div className={css.profileTile}>
+    // return  <div className={css.profileTile}>
+    //     <div>
+    //         <a href={profile ? `https://3box.io/${ethAddress}` : ''} disabled={profile} target="_blank" rel="noopener noreferrer">
+    //             <img
+    //             src={profile ? image : anonProfile}
+    //             className="profile-img"
+    //             alt="profile"
+    //             />
+    //         </a>
+    //     </div>
+    // </div>
+    return <div className={css.profileTile} onClick={showUserProfile}>
         <div>
-            <a href={profile ? `https://3box.io/${ethAddress}` : ''} disabled={profile} target="_blank" rel="noopener noreferrer">
                 <img
                 src={profile ? image : anonProfile}
                 className="profile-img"
                 alt="profile"
                 />
-            </a>
         </div>
     </div>
 }
@@ -58,7 +67,8 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
         {
-            fetchProfile
+            fetchProfile,
+            showUserProfile
         },
         dispatch
     )

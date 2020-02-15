@@ -32,20 +32,46 @@ import { API_URL } from '../../lib/config'
 import { FETCHING, SUCCESS } from "../../reducers/loading";
 import { MyLoader } from '../atoms/MyLoader'
 
-const Spaces = ({ myDid, data = [] }) => {
-  const [{ status, response }, makeRequest] = useApiRequest(`${API_URL}/users/${myDid}/spaces`, { verb: 'get' })
+
+
+
+const Spaces = ({ myDid, data = [], authToken }) => {
+  // const [{ status, response }, makeRequest] = useApiRequest(`${API_URL}/users/${myDid}/spaces`, { verb: 'get' })
+  const [state, setState] = useState({
+    status: FETCHING,
+  })
+
+  async function loadSpaces() {
+    let url = `${API_URL}/users/${myDid}/spaces`
+
+    axios.defaults.headers.common['Authorization'] = authToken
+    let res = await axios.get(url)
+    
+    console.log(res.data)
+    let spaces = res.data
+
+    setState({
+      status: SUCCESS,
+      spaces
+    })
+  }
+
   useEffect(() => {
-    makeRequest()
+    // makeRequest()
+
+    
+    loadSpaces()
+
   }, [])
 
   return <div>
-    {status === FETCHING && (
+    {state.status === FETCHING && (
       <MyLoader/>
     )}
-    {status === SUCCESS && (
+    {state.status === SUCCESS && (
       <CardColumns className={css.spaces}>
       { 
-        data.map((d, i) => <SpaceCard {...d} key={i} />)
+        state.spaces.map((d, i) => <SpaceCard {...d} key={i} />)
       }
       </CardColumns>
     )}
@@ -56,6 +82,7 @@ function mapStateToProps(state, props) {
   return {
       myDid: state.data.myDid,
       data: selectSpaces(state),
+      authToken: state.data.authToken,
       loading: false
   }
 }

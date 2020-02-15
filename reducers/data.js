@@ -7,6 +7,7 @@ const initialState = {
     myProfile: null,
     myAddress: null,
     myDid: null,
+    authToken: null
 }
 
 export default function(state = initialState, action) {
@@ -38,6 +39,7 @@ export default function(state = initialState, action) {
                 ...state,
                 loggedIn: false,
                 myProfile: null,
+                authToken: null,
                 // myAddress: null,
                 myDid: null
             }

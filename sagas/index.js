@@ -62,6 +62,8 @@ export const GET_MESSAGES_SUCCESS = 'GET_MESSAGES_SUCCESS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const MARK_MESSAGE_STATUS = 'MARK_MESSAGE_STATUS'
 
+export const SHOW_USER_PROFILE = 'SHOW_USER_PROFILE'
+
 function getArtifact(name) {
     const artifact = require(`../chain/${name}.json`)
     return artifact
@@ -213,7 +215,8 @@ export function* loadBox3() {
             // box,
             myProfile,
             myAddress,
-            myDid
+            myDid,
+            authToken
             // box, myProfile, myAddress
         }
     })

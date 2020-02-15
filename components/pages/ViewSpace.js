@@ -18,6 +18,7 @@ import { API_URL } from '../../lib/config';
 import { FETCHING, SUCCESS } from '../../reducers/loading';
 import ChatView from './ChatView'
 import axios from 'axios';
+import Sidebar from '../atoms/Sidebar';
 
 const ViewSpace = ({ addr }) => {
     let [state, setState] = useState({
@@ -87,10 +88,13 @@ const ViewSpace = ({ addr }) => {
             <div className={css.ctn}>
             {
                 !state.isMember
-                ? <button type="button" className={`btn btn-primary`} disabled={joiningSpace} onClick={joinSpace}>
+                ? <div><button type="button" className={`btn btn-primary`} disabled={joiningSpace} onClick={joinSpace}>
                     Join space
-                </button> 
-                : <ChatView spaceId={addr}/>
+                </button> </div>
+                : <>
+                    <ChatView spaceId={addr}/>
+                    <div className={css.sidebar}><Sidebar/></div>
+                </>
             }
             </div>
             

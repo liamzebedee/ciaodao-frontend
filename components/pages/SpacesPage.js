@@ -70,6 +70,27 @@ function Page({ createSpace, form }) {
     const [membershipType, setMembershipType] = useState('')
     const [addressDetails, setAddressDetails] = useState([])
 
+
+
+    // let [spacesState, setSpacesState] = useState({
+    //     loading: true
+    // })
+    // useEffect(() => {
+    //     async function loadSpaces() {
+    //         let url = `${API_URL}/users/spaces`
+
+    //         let res = await axios.get(url)
+            
+    //         console.log(res.data)
+    //         let spaces = res.data
+
+    //         setSpacesState({
+    //             loading: false,
+    //             spaces 
+    //         })
+    //     }
+    // }, [])
+
     function handleSubmit() {
         setSubmitted(true)
         createSpace(name, membershipType, addressDetails)
