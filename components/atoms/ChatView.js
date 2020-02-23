@@ -1,7 +1,7 @@
 
 import React, { Component, useState, useEffect, useReducer, useRef } from "react";
-import Post from "../atoms/Post";
-import { PostMessageInput } from "../atoms/PostMessageInput"
+import Post from "./Message";
+import { PostMessageInput } from "./PostMessageInput"
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { postMessage, getMessages } from '../../actions'
@@ -14,6 +14,7 @@ import _ from 'lodash'
 // import useResizeObserver from 'use-resize-observer'
 
 import css from './chat-view.less'
+import Message from "./Message";
 
 const ChatView = ({
     spaceId,
@@ -58,7 +59,7 @@ const ChatView = ({
         }
     
         return () => {
-          observer.current.unobserve();
+          observer.current.unobserve(chatviewEl.current);
         };
       }, [chatviewEl, observer]);
 
@@ -76,7 +77,7 @@ const ChatView = ({
             <div ref={chatviewEl}>
                 {
                     _.orderBy(messages, ['time'], ['asc'])
-                    .map(message => <Post {...message}/>)
+                    .map(message => <Message {...message}/>)
                 }
             </div>
 

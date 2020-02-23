@@ -2,8 +2,6 @@ import LandingPage from '../components/pages/LandingPage'
 import { connect } from 'react-redux'
 import React, { Component } from 'react';
 
-import { with3Box } from '../components/wrapper/KebabChain'
-
 class Container extends Component {
     componentDidMount() {
     }

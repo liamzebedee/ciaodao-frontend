@@ -51,7 +51,10 @@ export function getMembers(posts) {
 }
 
 export function getProfile(state, did) {
-    return state.profiles.box3Profiles[did]
+    return _.find(
+        state.profiles,
+        { did }
+    )
 }
 
 export function getEthAddress(state, did) {

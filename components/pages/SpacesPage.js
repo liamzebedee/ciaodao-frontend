@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 
 import styled from 'styled-components';
 import PageTemplate from "./PageTemplate"
-import { useRouter } from 'next/router'
+// import { useRouter } from 'next/router'
+import Router from 'next/router'
 
 
 import { Modal, Button, Form, ButtonGroup, FormControl, ButtonToolbar } from 'react-bootstrap'
@@ -12,7 +13,7 @@ import { bindActionCreators } from "redux";
 import { createSpace } from '../../actions'
 import Spaces from "../containers/Spaces";
 import { format } from "util";
-import { Router } from "next/router";
+// import { Router } from "next/router";
 
 import LoggedInUser from '../atoms/LoggedInUser'
 
@@ -58,7 +59,7 @@ const memedAddresses = addresses.map((addr, i) => {
 
 
 function Page({ createSpace, form }) {
-    const router = useRouter()
+    // const router = useRouter()
     
 
     const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
@@ -111,6 +112,7 @@ function Page({ createSpace, form }) {
                     <PreTextarea><Form.Control type="text" placeholder={memedAddresses[0]} onChange={onChange}/></PreTextarea>
                 </div>
             case MEMBERSHIP_TYPE_INVITE:
+                return null
                 return <div>
                     <small>Add Ethereum addresses:</small>
                     <PreTextarea><Form.Control as="textarea" rows="3" placeholder={memedAddresses.join('\n')} onChange={onChange}/></PreTextarea>
@@ -123,13 +125,15 @@ function Page({ createSpace, form }) {
     let title;
     let body;
     let footer = <Modal.Footer>
-        <Button variant="secondary" disabled={submitted} onClick={() => {
+        <Button variant="" disabled={submitted} onClick={() => {
             setShowCreateSpaceModal(false)
         }}>
             Cancel
         </Button>
         
-        <Button variant="primary" disabled={submitted || !(name != "" && membershipType != "" && addressDetails.length > 0)} onClick={handleSubmit}>
+        <Button variant="primary" disabled={
+            submitted || !(name != "" && membershipType != "" && (membershipType == MEMBERSHIP_TYPE_TOKEN ? addressDetails.length > 0 : true))} 
+            onClick={handleSubmit}>
             Submit
         </Button>
 
@@ -145,8 +149,9 @@ function Page({ createSpace, form }) {
             </Button>
              */}
             <Button variant="primary" onClick={() => {
-                router.push(`/spaces/${form.space}`)
+                Router.push(`/spaces/${form.space}`)
             }}>
+                
                 Go to space
             </Button>
         </div>
@@ -188,7 +193,7 @@ function Page({ createSpace, form }) {
     return <PageTemplate className="container">
         <Layout>
             <header>
-                <LoggedInUser/>
+                <LoggedInUser withDropdown/>
             </header>
 
             <h1>Spaces</h1>

@@ -3,18 +3,18 @@ import { getProfile, getEthAddress } from "../../selectors"
 import { bindActionCreators } from "redux"
 import { connect } from 'react-redux'
 import spotifyStyleTime from 'spotify-style-times'
+import { profileName } from '../shared'
+import css from './message.less'
 
-import css from './post.less'
-
-const Post = ({ time, content, messageId, author, profile, myDid }) => {
+const Message = ({ time, content, messageId, author, profile, myDid }) => {
     const humanTime = spotifyStyleTime(new Date(time))
-    return <div className={`${css.post} ${myDid == author.did && css.selfpost}`} key={messageId}>
+    return <div className={`${css.message} ${myDid == author.did && css.selfpost}`} key={messageId}>
         <div className={css.author}>
             <LazyProfileTile did={author.did}/>
         </div>
         
         <div className={css.body}>
-            <span className={css.profileName}>{(profile && profile.name) || `Unknown#${author.did.slice(-6)}`}</span>
+            <span className={css.profileName}>{ profileName(profile, author.did) }</span>
         
             <div className={css.content}>
                 {content}
@@ -23,10 +23,6 @@ const Post = ({ time, content, messageId, author, profile, myDid }) => {
                 </footer> */}
             </div>
         </div>
-
-        
-
-        
     </div>
 }
 
@@ -48,4 +44,4 @@ function mapDispatchToProps(dispatch) {
     )
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Post)
+export default connect(mapStateToProps, mapDispatchToProps)(Message)

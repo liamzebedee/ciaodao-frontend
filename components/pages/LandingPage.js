@@ -140,11 +140,11 @@ import LoggedInUser from "../atoms/LoggedInUser";
 
 function LandingPage({ loadBox3, login, logout, data, visitSpaces }) {
     const { 
-        loadingWeb3, loadingBox3, 
         loggedIn, 
         myAddress 
     } = data
 
+    let [loadingBox3, setLoadingBox3] = useState(false)
     return <PageTemplate>
         <HeroBlock>
             <Hero>ciao dao.</Hero>
@@ -158,7 +158,10 @@ function LandingPage({ loadBox3, login, logout, data, visitSpaces }) {
                     <button type="button" className="btn btn-success" onClick={visitSpaces}>Visit my spaces</button>
                     <button type="button" className="btn btn-outline" onClick={logout}>Logout</button>
                 </div> 
-                : <button type="button" className={`btn btn-primary`} disabled={loadingBox3} onClick={login}>Connect with 3Box</button> 
+                : <button type="button" className={`btn btn-primary`} disabled={loadingBox3} onClick={() => {
+                    setLoadingBox3(true)
+                    login()
+                }}>Connect with 3Box</button> 
             }
             
         </center>

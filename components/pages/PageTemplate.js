@@ -100,9 +100,7 @@ import axios from 'axios'
 
 function Home({ children, loading, authToken }) {
     // TODO: HACK HACK HACK
-    useEffect(async () => {
-        axios.defaults.headers.common['Authorization'] = authToken
-    }, [])
+    
 
     return <Style className="container-fluid">
         <Head>

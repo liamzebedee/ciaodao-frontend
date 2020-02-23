@@ -16,7 +16,6 @@ import { Router } from "next/router";
 
 import { SpaceCard } from '../atoms/SpaceCard'
 
-import css from './spaces.less'
 import { selectSpaces } from "../../selectors";
 
 
@@ -34,8 +33,9 @@ import { MyLoader } from '../atoms/MyLoader'
 
 
 
+import css from './spaces.less'
 
-const Spaces = ({ myDid, data = [], authToken }) => {
+const Spaces = ({ myDid, authToken }) => {
   // const [{ status, response }, makeRequest] = useApiRequest(`${API_URL}/users/${myDid}/spaces`, { verb: 'get' })
   const [state, setState] = useState({
     status: FETCHING,
@@ -69,11 +69,9 @@ const Spaces = ({ myDid, data = [], authToken }) => {
       <MyLoader/>
     )}
     {state.status === SUCCESS && (
-      <CardColumns className={css.spaces}>
-      { 
-        state.spaces.map((d, i) => <SpaceCard {...d} key={i} />)
-      }
-      </CardColumns>
+      <div className={css.spaces}>
+      { state.spaces.map((d, i) => <SpaceCard {...d} key={i} />) }
+      </div>
     )}
   </div>
 }
@@ -81,9 +79,7 @@ const Spaces = ({ myDid, data = [], authToken }) => {
 function mapStateToProps(state, props) {
   return {
       myDid: state.data.myDid,
-      data: selectSpaces(state),
-      authToken: state.data.authToken,
-      loading: false
+      authToken: state.data.authToken
   }
 }
 

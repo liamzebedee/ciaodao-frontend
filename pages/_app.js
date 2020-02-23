@@ -6,7 +6,6 @@ import { Provider } from 'react-redux'
 
 
 import { PersistGate } from 'redux-persist/integration/react'
-import { KebabChain } from '../components/wrapper/KebabChain'
 import Web3Wrapper from '../components/wrapper/Web3Wrapper'
 import styled from 'styled-components'
 import { persistStore } from 'redux-persist';

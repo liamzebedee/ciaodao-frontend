@@ -14,8 +14,8 @@ const persistConfig = {
     blacklist: [
         'flows',
         'spaces',
-        'messages'
-        // 'data'
+        'messages',
+        'profiles'
     ]
 }
 

@@ -9,7 +9,7 @@ import { getProfile, getEthAddress } from '../../selectors';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-
+import { useProfile } from '../hooks'
 
 import css from "./profile-tile.less";
 
@@ -17,35 +17,28 @@ const anonProfile = '/static/anonymous.jpg'
 
 
 
-const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile, showUserProfile }) => {
-    if(!profile) {
-        useEffect(() => {
-            fetchProfile(did)
-        })
+const LazyProfileTile = ({ did, ethAddress, fetchProfile }) => {
+    // if(!profile) {
+    //     useEffect(() => {
+    //         fetchProfile(did)
+    //     }, [])
+    //     return null
+    // }
+
+    let { loading, profile } = useProfile(did)
+
+    let image = anonProfile
+
+    if(!loading) {
+        if(profile.image && profile.image.length) {
+            image = `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
+        }
     }
-
-    let image
-
-    if(profile) {
-        image = `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl['/']}`
-    }
-
-    // TODO load ethAddress for any profile in sep reducer
-    // return  <div className={css.profileTile}>
-    //     <div>
-    //         <a href={profile ? `https://3box.io/${ethAddress}` : ''} disabled={profile} target="_blank" rel="noopener noreferrer">
-    //             <img
-    //             src={profile ? image : anonProfile}
-    //             className="profile-img"
-    //             alt="profile"
-    //             />
-    //         </a>
-    //     </div>
-    // </div>
+    
     return <div className={css.profileTile} onClick={showUserProfile}>
         <div>
                 <img
-                src={profile ? image : anonProfile}
+                src={image}
                 className="profile-img"
                 alt="profile"
                 />
@@ -55,19 +48,19 @@ const LazyProfileTile = ({ did, profile, ethAddress, fetchProfile, showUserProfi
 
 
 function mapStateToProps(state, props) {
-    let profile = getProfile(state, props.did)
-    let ethAddress = getEthAddress(state, props.did)
-
-    return {
-        profile,
-        ethAddress
-    }
+    // let profile = getProfile(state, props.did)
+    // let ethAddress = getEthAddress(state, props.did)
+    return {}
+    // return {
+    //     profile,
+    //     ethAddress
+    // }
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators(
         {
-            fetchProfile,
+            // fetchProfile,
             showUserProfile
         },
         dispatch

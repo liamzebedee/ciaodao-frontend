@@ -12,6 +12,7 @@ import axios from 'axios'
 import { API_URL } from '../lib/config';
 
 let provider
+let threeboxProvider
 let signer 
 let myAddress
 
@@ -19,7 +20,7 @@ let mySpace
 
 const MAINNET = 1
 
-let chainId = null
+let chainId = 123
 
 let box
 export { box }
@@ -76,6 +77,7 @@ async function getDeployment(artifact) {
     if(keys.length === 0) throw new Error("no deployments")
 
     let deploy
+    console.log(chainId)
     if(chainId) {
         deploy = networks[chainId]
         if(!deploy) throw new Error("no deployment")
@@ -94,21 +96,37 @@ async function syncBox(box) {
     })
 }
 
+const PUBLIC_CHAIN_IDS = [1,2,3,4,5,6]
 export function* loadWeb3() {
     yield put({
         type: WEB3_LOADING
     })
     const addresses = yield call(window.ethereum.enable)
     myAddress = addresses[0];
+
+    // window.ethereum.on('accountsChanged', function (accounts) {
+    //     if(accounts[0] != myAddress) {
+    //         Router.push('/')
+    //     }
+    // })
+
     // provider = new ethers.providers.Web3Provider(window.ethereum);
-    provider = new ethers.providers.Web3Provider(window.ethereum)
-    signer = provider.getSigner(0);
+
+    
+    // provider = new ethers.providers.Web3Provider(window.ethereum)
+    provider = ethers.getDefaultProvider('rinkeby')
+    threeboxProvider = window.ethereum
+
+    signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner()
+    // signer = provider.getSigner(0);
+
     // yield call(() => new Promise((res,rej) => {
     //     provider.on('ready', res)
     //     setTimeout(rej, 5000)
     // }))
 
     const network = yield call(() => provider.getNetwork())
+    if(!network.chainId) throw new Error("No chainId found for network: ", network)
     chainId = network.chainId
     // let network = yield call(provider.getNetwork)
     // chainId = MAINNET
@@ -165,17 +183,20 @@ export function* loadBox3() {
         type: LOAD_BOX3_PENDING
     })
 
-    box = yield call(Box.openBox, myAddress, window.ethereum)
-    const myProfile = yield call(Box.getProfile, myAddress)
+    box = yield call(Box.openBox, myAddress, threeboxProvider, {
+        pinningNode: process.env.THREEBOX_PINNING_NODE,
+        addressServer: 'http://127.0.0.1:3001'
+    })
+    // await box.syncDone
+    console.log(`3Box sync done`)
+
 
     // yield call(authenticateToCiaoDao)
     yield call(async () => {
         await box.linkAddress()
         console.log(`ETH address linked`)
 
-        // await box.syncDone
-        // console.log(`3Box sync done`)
-
+        
         const links = await box.listAddressLinks()
         if(!links.length) {
             throw new Error("Ethereum address not linked to 3Box profile, or proofs cannot be found.")
@@ -194,6 +215,8 @@ export function* loadBox3() {
         }
     })
 
+    const myProfile = yield call(Box.getProfile, myAddress)
+    
     // Now we can sign messages to go out to the server.
     // We identify the user solely by their DID,
     // since this contains claims of links to their Ethereum addresses.
@@ -270,7 +293,7 @@ export function* createGroup({ payload }) {
         tx = yield call(
             contract.functions.createSpace,
             name,
-            addressDetails
+            []
         )
     }
 
@@ -387,23 +410,16 @@ export function* fetchProfile({ payload: { did } }) {
     fetchProfileInProgress[did] = true
 
     let profile = yield call(Box.getProfile, did)
-    let ethAddress = yield call(getEthereumAddress, did, profile)
+    // let ethAddress = yield call(getEthereumAddress, did, profile)
+    // console.log(profile,ethAddress)
 
-    console.log(profile,ethAddress)
-
-    let profileComplete = profile.name && profile.image.length
-    if(profileComplete) {
-        yield put({
-            type: FETCH_PROFILE_SUCCESS,
-            payload: {
-                profile,
-                did,
-                ethAddress
-            }
-        })
-    } else {
-        // TODO nothing for now
-    }
+    yield put({
+        type: FETCH_PROFILE_SUCCESS,
+        payload: {
+            ...profile,
+            did
+        }
+    })
 
 
     /*
@@ -508,20 +524,6 @@ export function* getMessages({ payload }) {
             }
         })
     })
-
-
-    // async function getMessages() {
-    //     let url = `${API_URL}/spaces/${spaceId}/messages`
-
-    //     let res = await axios.get(url)
-        
-    //     console.log(res.data)
-        
-
-    //     setState({
-    //         messages: res.data
-    //     })
-    // }
 }
 
 export default function* () {

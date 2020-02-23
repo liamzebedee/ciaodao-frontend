@@ -2,7 +2,7 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 
-
+import css from './post-message-input.less'
 
 const PostMessageInput = ({ onSubmit }) => {
     let [text, setText] = useState('')
@@ -19,13 +19,15 @@ const PostMessageInput = ({ onSubmit }) => {
         }
     }
 
-    return <>
+    return <div className={css.postMessage}>
         <textarea 
             value={text} 
             onKeyDown={handleKeyDown} 
             onChange={ev => setText(ev.target.value)}
+            rows={3}
+            placeholder="Ciao, hello, bonjour, g'day, hoi..."
         ></textarea>
-    </>
+    </div>
 }
 
 export { PostMessageInput }

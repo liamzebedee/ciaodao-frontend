@@ -4,14 +4,33 @@ import React from 'react'
 
 import css from './sidebar.less'
 import { TheStore } from './TheStore'
+import LazyProfileTile from "./LazyProfileTile"
+import { useProfile } from '../hooks'
+import { profileName } from '../shared'
 
-const Sidebar = () => {
+const Sidebar = ({ name = "", tokenAddress = "", members = [] }) => {
     return <div className={css.sidebar}>
-        <h2>Sidecar DAO</h2>
-        <p>12 members</p> <pre>0x38b8639d03D2367BbA4B66e1880DC847729AE1B1</pre>
-        
+        <h2>The Ciao DAO ({name})</h2>
+        <pre>{tokenAddress}</pre>
 
-        <button type="button" className={`btn btn-primary`}>
+        <section className={css.members}>
+            <h3>{members.length} members</h3>
+            <div className={css.memberList}>
+                { members.map(({ did, addresses }) => {
+                    let { profile, loading } = useProfile(did)
+                    return <div className={css.member}>
+                        <div className={css.profileTile}><LazyProfileTile did={did}/></div>
+
+                        <div className={css.details}>
+                            <div className={css.name}>{ profileName(profile, did) }</div>
+                            <div className={css.address}><pre>{addresses[0].address}</pre></div>
+                        </div>
+                    </div>
+                }) }
+            </div>
+        </section>
+
+        {/* <button type="button" className={`btn btn-primary`}>
             Send
         </button>
 
@@ -20,8 +39,12 @@ const Sidebar = () => {
         </button>
 
         <button type="button" className={`btn btn-primary`}>
-            Propose
+            Mint
         </button>
+
+        <button type="button" className={`btn btn-primary`}>
+            Propose
+        </button> */}
 
 
     </div>

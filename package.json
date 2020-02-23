@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "API_URL=http://localhost:3001 next",
+    "dev": "ETH_RPC_URL=https://rinkeby.infura.io/v3/3049535d150e49729f54f6f8bef40a1b API_URL=http://localhost:4001 THREEBOX_PINNING_NODE=/ip4/127.0.0.1/tcp/4002/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9 next",
     "build": "next build",
     "start": "next start -p $PORT",
     "export": "next export",
@@ -13,7 +13,8 @@
     "npm": "~6.9.0"
   },
   "dependencies": {
-    "3box": "1.10.7",
+    "3box": "^1.17.0",
+    "3box-profile-edit-react": "^0.0.8",
     "3id-resolver": "^0.0.6",
     "@jukben/emoji-search": "^2.0.1",
     "@portis/web3": "^2.0.0-beta.38",
@@ -27,7 +28,7 @@
     "did-jwt": "^3.0.0",
     "draft-js": "^0.11.4",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^4.0.41",
+    "ethers": "4.0.45",
     "history": "^4.9.0",
     "humanize-plus": "^1.8.2",
     "jquery": "^3.4.1",
@@ -54,6 +55,7 @@
     "slate-react": "^0.57.1",
     "spotify-style-times": "^1.1.0",
     "styled-components": "^5.0.0-beta.5",
+    "use-resize-observer": "^6.0.0",
     "web3": "^1.2.1"
   },
   "devDependencies": {
@@ -65,6 +67,7 @@
     "@storybook/react": "^5.3.6",
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.2",
+    "prettier": "1.19.1",
     "webpack": "^4.39.3"
   }
 }
