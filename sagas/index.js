@@ -10,6 +10,8 @@ import { submitThing } from '../actions';
 import { getMembers } from '../selectors';
 import axios from 'axios'
 import { API_URL } from '../lib/config';
+import { startRealtimeConnection } from './realtime';
+import Web3 from 'web3'
 
 let provider
 let threeboxProvider
@@ -183,6 +185,8 @@ export function* loadBox3() {
         type: LOAD_BOX3_PENDING
     })
 
+    yield fork(startRealtimeConnection)
+
     box = yield call(Box.openBox, myAddress, threeboxProvider, {
         pinningNode: process.env.THREEBOX_PINNING_NODE,
         addressServer: 'http://127.0.0.1:3001'
@@ -195,7 +199,6 @@ export function* loadBox3() {
     yield call(async () => {
         await box.linkAddress()
         console.log(`ETH address linked`)
-
         
         const links = await box.listAddressLinks()
         if(!links.length) {
@@ -285,7 +288,7 @@ export function* createGroup({ payload }) {
 
     if(membershipType == MEMBERSHIP_TYPE_TOKEN) {
         tx = yield call(
-            contract.functions.createERC20Space,
+            contract.functions.createTokenSpace,
             name,
             addressDetails[0]
         )
@@ -466,7 +469,7 @@ function* postMessage({ payload }) {
         })
     })
 
-    const messageId = web3.utils.sha3(jwt)
+    const id = Web3.utils.sha3(jwt)
     
     // Optimistic UI.
     yield put({
@@ -478,7 +481,7 @@ function* postMessage({ payload }) {
             author: {
                 did: myDid
             },
-            messageId,
+            id,
 
             status: "sending"
         }
@@ -497,7 +500,7 @@ function* postMessage({ payload }) {
     yield put({
         type: MARK_MESSAGE_STATUS,
         payload: {
-            messageId,
+            messageId: id,
             status: "sent"
         }
     })

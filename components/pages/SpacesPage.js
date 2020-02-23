@@ -236,7 +236,7 @@ function Page({ createSpace, form }) {
 
             <br/>
             
-            <h2>My spaces</h2>
+            <h2 className='header'>My spaces</h2>
             <Spaces/>
         </Layout>
     </PageTemplate>

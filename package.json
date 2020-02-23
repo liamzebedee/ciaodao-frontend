@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "ETH_RPC_URL=https://rinkeby.infura.io/v3/3049535d150e49729f54f6f8bef40a1b API_URL=http://localhost:4001 THREEBOX_PINNING_NODE=/ip4/127.0.0.1/tcp/4002/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9 next",
+    "dev": "ETH_RPC_URL=https://rinkeby.infura.io/v3/3049535d150e49729f54f6f8bef40a1b API_URL=http://localhost:4001 WS_API_URL=ws://localhost:4001 THREEBOX_PINNING_NODE=/ip4/127.0.0.1/tcp/4002/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9 next",
     "build": "next build",
     "start": "next start -p $PORT",
     "export": "next export",
@@ -29,6 +29,7 @@
     "draft-js": "^0.11.4",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "4.0.45",
+    "fortmatic": "^1.1.3",
     "history": "^4.9.0",
     "humanize-plus": "^1.8.2",
     "jquery": "^3.4.1",
@@ -53,6 +54,7 @@
     "slate": "^0.57.1",
     "slate-history": "^0.57.1",
     "slate-react": "^0.57.1",
+    "socket.io": "^2.3.0",
     "spotify-style-times": "^1.1.0",
     "styled-components": "^5.0.0-beta.5",
     "use-resize-observer": "^6.0.0",

@@ -57,9 +57,6 @@ const Spaces = ({ myDid, authToken }) => {
   }
 
   useEffect(() => {
-    // makeRequest()
-
-    
     loadSpaces()
 
   }, [])

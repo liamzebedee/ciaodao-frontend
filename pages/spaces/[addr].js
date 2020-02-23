@@ -10,8 +10,8 @@ export default () => {
     const { addr } = router.query
 
     return <Web3Wrapper>
-        <Box3Wrapper>
+        {/* <Box3Wrapper> */}
             <ViewSpace {...{addr}}/>
-        </Box3Wrapper>
+        {/* </Box3Wrapper> */}
     </Web3Wrapper>
 }

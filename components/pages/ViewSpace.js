@@ -1,11 +1,11 @@
 import Box from "3box";
 import React, { Component, useState, useEffect } from "react";
 import { Card, ListGroup } from "react-bootstrap";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
 import styled from "styled-components";
-import { addUserProfile, loadSpace, loadPosts } from "../../actions";
-import { box, ciaoWrapMessage } from "../../sagas";
+import { addUserProfile, loadSpace, loadPosts, loadBox3 } from "../../actions";
+import { box, ciaoWrapMessage, GET_MESSAGES_SUCCESS } from "../../sagas";
 import LazyProfileTile from "../atoms/LazyProfileTile";
 import PageTemplate from "./PageTemplate";
 import css from "./space.less";
@@ -19,33 +19,66 @@ import axios from "axios";
 import Sidebar from "../atoms/Sidebar";
 import ChatView from "../atoms/ChatView";
 
-const ViewSpace = ({ addr }) => {
+import io from 'socket.io-client'
+
+const ViewSpace = ({ loadBox3, addr, authToken }) => {
   let [state, setState] = useState({
     isMember: false,
     members: []
-  });
-  let [joiningSpace, setJoiningSpace] = useState(false);
-  let [pane, setPane] = useState("home");
-  let content = null;
+  })
+  let [joiningSpace, setJoiningSpace] = useState(false)
+  let [pane, setPane] = useState("home")
+  let content = null
 
   // Get space info,
   async function getSpaceInfo() {
     let url = `${API_URL}/spaces/${addr}`;
-
+    axios.defaults.headers.common['Authorization'] = authToken
     let res = await axios.get(url);
 
     console.log(res.data);
-    let { name, isMember, latestMessage, members } = res.data;
+    let { name, id, tokenAddress, isMember, latestMessage, members, tokenName } = res.data;
 
     setState({
+      name,
+      id,
+      tokenAddress,
+      tokenName,
       isMember,
       latestMessage,
       members
     });
   }
 
+  const dispatch = useDispatch()
+
+  function listenForMessages() {
+      const realtimeSpace = io(`${API_URL}/spaces/${addr}`, { reconnection: true });
+
+      realtimeSpace.on('connect', function () {
+          console.log('Connected to WebSocket API')
+      })
+      
+      realtimeSpace.on('message', function (message) {
+          console.log('socket', message)
+          
+          dispatch({
+              type: GET_MESSAGES_SUCCESS,
+              payload: [
+                // TODO HACK HACK HACK
+                {
+                  ...message,
+                  space: addr
+                }
+              ]
+          })
+      })
+  }
+
   useEffect(() => {
-    getSpaceInfo();
+    loadBox3()
+    getSpaceInfo()
+    listenForMessages()
   }, []);
 
   async function joinSpace() {
@@ -102,12 +135,15 @@ const ViewSpace = ({ addr }) => {
 
 function mapStateToProps(state, props) {
   return {
-    spaceId: props.addr
-  };
+    spaceId: props.addr,
+    authToken: state.data.authToken
+  }
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({}, dispatch);
+  return bindActionCreators({
+    loadBox3
+  }, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewSpace);

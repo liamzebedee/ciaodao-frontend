@@ -1,11 +1,11 @@
 {
-  "contractName": "IMembershipResolver",
+  "contractName": "ISpace",
   "abi": [
     {
       "constant": true,
       "inputs": [
         {
-          "name": "x",
+          "name": "a",
           "type": "address"
         }
       ],
@@ -21,25 +21,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"x\",\"type\":\"address\"}],\"name\":\"isMember\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/liamz/Documents/open-source/ciaodao/contracts/contracts/IMembershipResolver.sol\":\"IMembershipResolver\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/liamz/Documents/open-source/ciaodao/contracts/contracts/IMembershipResolver.sol\":{\"keccak256\":\"0x76209db192dfd6f5edd8782b004fe03f4bab9886044801ac71a27a81be863963\",\"urls\":[\"bzzr://ef0c35188737e353636f85c9bd48629f416f88d9352965f379f8d72f05e03c45\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"a\",\"type\":\"address\"}],\"name\":\"isMember\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/liamz/Documents/open-source/everest/fundao/contracts/ISpace.sol\":\"ISpace\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/liamz/Documents/open-source/everest/fundao/contracts/ISpace.sol\":{\"keccak256\":\"0x12ba74683eb4a2c3ff30bd0303e5ed9a7cf357e513b9eb119160534fd5c86ba5\",\"urls\":[\"bzzr://92b7fd6cace346b11d84e0325ef8038d0cc18fc70c339fdab8614d9e951bade6\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity >=0.4.21 <0.6.0;\n\ninterface IMembershipResolver {\n    function isMember(address x) external view returns (bool);\n}",
-  "sourcePath": "/Users/liamz/Documents/open-source/ciaodao/contracts/contracts/IMembershipResolver.sol",
+  "source": "pragma solidity >=0.4.21 <0.6.0;\n\ninterface ISpace {\n    // function name() external view returns (string memory);\n    function isMember(address a) external view returns (bool);\n}",
+  "sourcePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/ISpace.sol",
   "ast": {
-    "absolutePath": "/Users/liamz/Documents/open-source/ciaodao/contracts/contracts/IMembershipResolver.sol",
+    "absolutePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/ISpace.sol",
     "exportedSymbols": {
-      "IMembershipResolver": [
-        153
+      "ISpace": [
+        345
       ]
     },
-    "id": 154,
+    "id": 346,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 145,
+        "id": 337,
         "literals": [
           "solidity",
           ">=",
@@ -50,7 +50,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:32:3"
+        "src": "0:32:8"
       },
       {
         "baseContracts": [],
@@ -58,33 +58,33 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 153,
+        "id": 345,
         "linearizedBaseContracts": [
-          153
+          345
         ],
-        "name": "IMembershipResolver",
+        "name": "ISpace",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": null,
             "documentation": null,
-            "id": 152,
+            "id": 344,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isMember",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 148,
+              "id": 340,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 147,
-                  "name": "x",
+                  "id": 339,
+                  "name": "a",
                   "nodeType": "VariableDeclaration",
-                  "scope": 152,
-                  "src": "88:9:3",
+                  "scope": 344,
+                  "src": "137:9:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -92,10 +92,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 146,
+                    "id": 338,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "88:7:3",
+                    "src": "137:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -106,19 +106,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "87:11:3"
+              "src": "136:11:8"
             },
             "returnParameters": {
-              "id": 151,
+              "id": 343,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 150,
+                  "id": 342,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 152,
-                  "src": "122:4:3",
+                  "scope": 344,
+                  "src": "171:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -126,10 +126,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 149,
+                    "id": 341,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "122:4:3",
+                    "src": "171:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -139,33 +139,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "121:6:3"
+              "src": "170:6:8"
             },
-            "scope": 153,
-            "src": "70:58:3",
+            "scope": 345,
+            "src": "119:58:8",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 154,
-        "src": "34:96:3"
+        "scope": 346,
+        "src": "34:145:8"
       }
     ],
-    "src": "0:130:3"
+    "src": "0:179:8"
   },
   "legacyAST": {
-    "absolutePath": "/Users/liamz/Documents/open-source/ciaodao/contracts/contracts/IMembershipResolver.sol",
+    "absolutePath": "/Users/liamz/Documents/open-source/everest/fundao/contracts/ISpace.sol",
     "exportedSymbols": {
-      "IMembershipResolver": [
-        153
+      "ISpace": [
+        345
       ]
     },
-    "id": 154,
+    "id": 346,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 145,
+        "id": 337,
         "literals": [
           "solidity",
           ">=",
@@ -176,7 +176,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:32:3"
+        "src": "0:32:8"
       },
       {
         "baseContracts": [],
@@ -184,33 +184,33 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 153,
+        "id": 345,
         "linearizedBaseContracts": [
-          153
+          345
         ],
-        "name": "IMembershipResolver",
+        "name": "ISpace",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": null,
             "documentation": null,
-            "id": 152,
+            "id": 344,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isMember",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 148,
+              "id": 340,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 147,
-                  "name": "x",
+                  "id": 339,
+                  "name": "a",
                   "nodeType": "VariableDeclaration",
-                  "scope": 152,
-                  "src": "88:9:3",
+                  "scope": 344,
+                  "src": "137:9:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -218,10 +218,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 146,
+                    "id": 338,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "88:7:3",
+                    "src": "137:7:8",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -232,19 +232,19 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "87:11:3"
+              "src": "136:11:8"
             },
             "returnParameters": {
-              "id": 151,
+              "id": 343,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 150,
+                  "id": 342,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 152,
-                  "src": "122:4:3",
+                  "scope": 344,
+                  "src": "171:4:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -252,10 +252,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 149,
+                    "id": 341,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "122:4:3",
+                    "src": "171:4:8",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -265,20 +265,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "121:6:3"
+              "src": "170:6:8"
             },
-            "scope": 153,
-            "src": "70:58:3",
+            "scope": 345,
+            "src": "119:58:8",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 154,
-        "src": "34:96:3"
+        "scope": 346,
+        "src": "34:145:8"
       }
     ],
-    "src": "0:130:3"
+    "src": "0:179:8"
   },
   "compiler": {
     "name": "solc",
@@ -286,7 +286,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.13",
-  "updatedAt": "2020-02-08T14:59:39.339Z",
+  "updatedAt": "2020-02-08T14:59:39.345Z",
   "devdoc": {
     "methods": {}
   },

@@ -13,12 +13,12 @@ import { bindActionCreators } from "redux";
 import { format } from "util";
 import { Router } from "next/router";
 
-export const SpaceCard = ({ name, tokenAddress }) => {
+export const SpaceCard = ({ id, name, tokenAddress, members }) => {
     return <Card style={{ width: '300px' }}>
       <div className="card-body">
         <h5 className="card-title">{name}</h5>
-        <p className="card-text"><small className="text-muted">last active today &middot; 4 members</small></p>
-        <a href={`/spaces/${tokenAddress}`} className="btn btn-dark">Open group</a>
+        {/* <p className="card-text"><small className="text-muted">last active today &middot; {members.length} members</small></p> */}
+        <a href={`/spaces/${id}`} className="btn btn-dark">Open group</a>
       </div>
     </Card>
 }

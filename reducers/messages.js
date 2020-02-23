@@ -1,5 +1,5 @@
 import { ADD_MESSAGE, MARK_MESSAGE_STATUS, GET_MESSAGES_SUCCESS } from "../sagas"
-
+import _ from 'lodash'
 const initialState = []
 
 export default function reduce(state = initialState, action) {
@@ -11,10 +11,10 @@ export default function reduce(state = initialState, action) {
             ]
         
         case GET_MESSAGES_SUCCESS:
-            return [
+            return _.uniqBy([
                 ...state,
                 ...action.payload
-            ]
+            ], 'id')
         
         case MARK_MESSAGE_STATUS:
             return state.map(message => {

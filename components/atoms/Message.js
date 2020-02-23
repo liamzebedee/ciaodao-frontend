@@ -5,16 +5,20 @@ import { connect } from 'react-redux'
 import spotifyStyleTime from 'spotify-style-times'
 import { profileName } from '../shared'
 import css from './message.less'
+import { useProfile } from "../hooks"
 
-const Message = ({ time, content, messageId, author, profile, myDid }) => {
+const Message = ({ time, content, messageId, author, myDid }) => {
     const humanTime = spotifyStyleTime(new Date(time))
-    return <div className={`${css.message} ${myDid == author.did && css.selfpost}`} key={messageId}>
+    const { did } = author
+    let { profile, loaded } = useProfile(did)
+
+    return <div className={`${css.message} ${myDid == did && css.selfpost}`} key={messageId}>
         <div className={css.author}>
-            <LazyProfileTile did={author.did}/>
+            <LazyProfileTile did={did}/>
         </div>
         
         <div className={css.body}>
-            <span className={css.profileName}>{ profileName(profile, author.did) }</span>
+            <span className={css.profileName}>{ profileName(profile, did) }</span>
         
             <div className={css.content}>
                 {content}
